@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Livre d'Or Complet - 70 Ans ITS Salama</title>
+
+  <!-- Frameworks et polices -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Merriweather:wght@300;400;700&family=Sacramento&display=swap" rel="stylesheet">
+  
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore-compat.js"></script>
+
+  <style>
+    :root {
+      --primary-blue: #1E3A8A;
+      --secondary-gold: #D97706;
+      --accent-green: #059669;
+      --fond: #f0f9ff;
+      --texte: #1e293b;
+    }
+
+    body {
+      font-family: 'Merriweather', serif;
+      background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+      color: var(--texte);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    /* Bannière défilante */
+    .marquee-banner {
+      background: linear-gradient(90deg, 
+        var(--primary-blue), 
+        #2563eb, 
+        var(--accent-green), 
+        #10b981, 
+        var(--secondary-gold), 
+        #f59e0b,
+        var(--primary-blue));
+      background-size: 400% 100%;
+      color: white;
+      padding: 1.2rem 0;
+      overflow: hidden;
+      white-space: nowrap;
+      position: relative;
+      font-weight: 800;
+      font-size: 1.5rem;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.4);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      animation: gradient-shift 8s ease infinite;
+    }
+
+    @keyframes gradient-shift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .marquee-content {
+      display: inline-block;
+      padding-left: 100%;
+      animation: defilement-rtl 20s infinite linear;
+    }
+
+    @keyframes defilement-rtl {
+      0% { transform: translate3d(0,0,0); }
+      100% { transform: translate3d(-100%,0,0); }
+    }
+
+    /* En-tête avec autocollant */
+    .sticker-anniversaire {
+      position: relative;
+      display: inline-block;
+      background: linear-gradient(135deg, var(--secondary-gold), #f59e0b, #fbbf24);
+      color: white;
+      padding: 1.8rem 2.5rem;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-5deg);
+      box-shadow: 0 15px 30px rgba(217, 119, 6, 0.5), 
+                  0 0 0 1px rgba(255,255,255,0.2) inset,
+                  0 0 20px rgba(255,215,0,0.4) inset;
+      margin: 2rem auto;
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      text-align: center;
+      z-index: 10;
+      animation: sticker-pulse 3s infinite alternate;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+
+    @keyframes sticker-pulse {
+      0% { transform: rotate(-5deg) scale(1); }
+      100% { transform: rotate(-5deg) scale(1.05); }
+    }
+
+    .sticker-anniversaire::after {
+      content: "";
+      position: absolute;
+      bottom: -12px;
+      right: -12px;
+      width: 60px;
+      height: 60px;
+      background: radial-gradient(circle at top left, transparent 70%, rgba(0,0,0,0.15) 70%);
+    }
+
+    /* Boutons */
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-blue), #3730a3);
+      color: white;
+      font-weight: 700;
+      border: none;
+      border-radius: 50px;
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(30, 58, 138, 0.4);
+      text-decoration: none;
+      display: inline-block;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.7s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(30, 58, 138, 0.6);
+    }
+
+    .btn-primary:hover::before {
+      left: 100%;
+    }
+
+    /* Filtres améliorés */
+    .filter-btn {
+      padding: 0.7rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 9999px;
+      border: 2px solid var(--primary-blue);
+      color: var(--primary-blue);
+      background-color: transparent;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      margin: 0.5rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .filter-btn.active {
+      background: linear-gradient(135deg, var(--primary-blue), #3730a3);
+      color: white;
+      box-shadow: 0 6px 15px rgba(30, 58, 138, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .filter-btn:hover:not(.active) {
+      background-color: rgba(30, 58, 138, 0.1);
+      transform: translateY(-2px);
+    }
+
+    /* Cartes de témoignage améliorées */
+    .testimonial-card {
+      background: linear-gradient(135deg, #ffffff, #f8fafc);
+      border-radius: 20px;
+      padding: 2.5rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+      border-left: 8px solid var(--secondary-gold);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .testimonial-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-blue), var(--accent-green), var(--secondary-gold));
+    }
+
+    .testimonial-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+    }
+
+    .testimonial-card::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, rgba(217, 119, 6, 0.1), transparent);
+      border-radius: 0 0 0 80px;
+    }
+
+    .testimonial-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--primary-blue);
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 3px dashed var(--secondary-gold);
+      display: flex;
+      align-items: center;
+    }
+
+    .testimonial-name::before {
+      content: "✍️";
+      margin-right: 0.8rem;
+      font-size: 1.8rem;
+    }
+
+    .testimonial-message {
+      font-size: 1.2rem;
+      line-height: 1.8;
+      color: #444;
+      font-style: italic;
+      margin-bottom: 2rem;
+      position: relative;
+      padding-left: 2rem;
+      background: rgba(248, 250, 252, 0.7);
+      padding: 1.5rem;
+      border-radius: 12px;
+      border-left: 4px solid var(--accent-green);
+    }
+
+    .testimonial-message::before {
+      content: "“";
+      position: absolute;
+      left: 0.5rem;
+      top: -0.5rem;
+      font-size: 4rem;
+      color: var(--secondary-gold);
+      font-family: 'Playfair Display', serif;
+      line-height: 1;
+    }
+
+    .testimonial-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 2px solid #e2e8f0;
+    }
+
+    .testimonial-signature {
+      font-family: 'Sacramento', cursive;
+      font-size: 2.5rem;
+      color: var(--primary-blue);
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .testimonial-date {
+      font-size: 1rem;
+      color: #777;
+      background: rgba(248, 250, 252, 0.8);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    /* Animation d'apparition améliorée */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .animate-card {
+      animation: fadeInUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      opacity: 0;
+    }
+
+    /* Compteur de messages amélioré */
+    .counter-badge {
+      background: linear-gradient(135deg, var(--secondary-gold), #f59e0b);
+      color: white;
+      border-radius: 50px;
+      padding: 0.8rem 2rem;
+      font-weight: 800;
+      display: inline-block;
+      margin: 1.5rem 0;
+      box-shadow: 0 8px 20px rgba(217, 119, 6, 0.4);
+      font-size: 1.2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .counter-badge::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.7s;
+    }
+
+    .counter-badge:hover::before {
+      left: 100%;
+    }
+
+    /* Section vide améliorée */
+    .empty-state {
+      text-align: center;
+      padding: 5rem 1rem;
+      color: #64748b;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      margin: 2rem 0;
+    }
+
+    .empty-state-icon {
+      font-size: 5rem;
+      margin-bottom: 2rem;
+      opacity: 0.7;
+    }
+
+    /* Barre de recherche */
+    .search-container {
+      max-width: 600px;
+      margin: 2rem auto;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 1.2rem 1.5rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-family: 'Merriweather', serif;
+      transition: all 0.3s ease;
+      background: white;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      padding-left: 3rem;
+    }
+
+    .search-input:focus {
+      border-color: var(--secondary-gold);
+      box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2), 0 8px 20px rgba(0,0,0,0.1);
+      outline: none;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1.2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.2rem;
+      color: #94a3b8;
+    }
+
+    /* Pagination améliorée */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 3rem 0;
+    }
+
+    .pagination-btn {
+      padding: 0.8rem 1.5rem;
+      margin: 0 0.5rem;
+      border: 2px solid var(--primary-blue);
+      background: white;
+      color: var(--primary-blue);
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .pagination-btn:hover:not(:disabled) {
+      background: var(--primary-blue);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(30, 58, 138, 0.3);
+    }
+
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .pagination-info {
+      margin: 0 1.5rem;
+      font-weight: 600;
+      color: var(--primary-blue);
+      background: rgba(248, 250, 252, 0.8);
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+    }
+
+    /* Section de statistiques */
+    .stats-container {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      margin: 3rem 0;
+    }
+    
+    .stat-item {
+      text-align: center;
+      padding: 2rem;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      margin: 1rem;
+      flex: 1;
+      min-width: 200px;
+      border-top: 5px solid var(--secondary-gold);
+      transition: all 0.3s ease;
+    }
+
+    .stat-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+    
+    .stat-number {
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: var(--primary-blue);
+      display: block;
+    }
+    
+    .stat-label {
+      font-size: 1.1rem;
+      color: #64748b;
+      margin-top: 0.5rem;
+    }
+
+    /* Signature du développeur */
+    .developer-signature {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 4rem;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      max-width: 450px;
+      margin-left: auto;
+      margin-right: auto;
+      border: 1px solid rgba(217, 119, 6, 0.2);
+    }
+    
+    .developer-photo {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--secondary-gold);
+      margin-right: 1.5rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .developer-info {
+      text-align: left;
+    }
+    
+    .developer-name {
+      font-weight: 800;
+      color: var(--primary-blue);
+      font-size: 1.2rem;
+    }
+    
+    .developer-role {
+      color: #64748b;
+      font-size: 1rem;
+    }
+    
+    .developer-phone {
+      color: var(--accent-green);
+      font-size: 0.9rem;
+      margin-top: 0.3rem;
+    }
+
+    /* Impression */
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      
+      .testimonial-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #e2e8f0;
+        transform: none !important;
+      }
+      
+      .developer-signature {
+        box-shadow: none;
+        border: 1px solid #e2e8f0;
+      }
+    }
+
+    /* Effet de particules flottantes */
+    .floating-particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
+    
+    .particle {
+      position: absolute;
+      background: rgba(217, 119, 6, 0.1);
+      border-radius: 50%;
+      animation: float 15s infinite linear;
+    }
+    
+    @keyframes float {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Particules flottantes -->
+  <div class="floating-particles" id="particles"></div>
+
+  <!-- Bannière défilante -->
+  <div class="marquee-banner">
+    <div class="marquee-content">
+      🎉 70 ANS D'EXCELLENCE - INSTITUT TECHNIQUE SALAMA DE DON BOSCO - BONNE FÊTE 🎊 
+      &nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp; 
+      Depuis 1955 - Formation Technique de Qualité &nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;
+      🎉 70 ANS D'EXCELLENCE - INSTITUT TECHNIQUE SALAMA DE DON BOSCO - BONNE FÊTE 🎊
+    </div>
+  </div>
+
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <!-- En-tête -->
+    <div class="text-center">
+      <div class="sticker-anniversaire">
+        <div>70 Ans</div>
+        <div style="font-size: 1.4rem;">ITS Salama</div>
+      </div>
+      
+      <h1 class="text-5xl md:text-6xl font-bold mt-6 mb-6" style="color: var(--primary-blue); font-family: 'Playfair Display', serif;">
+        Livre d'Or du 70<sup>ème</sup> Anniversaire
+      </h1>
+      <p class="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
+        Découvrez tous les messages d'hommage et témoignages laissés par la communauté de l'ITS Salama
+      </p>
+
+      <!-- Compteur de messages -->
+      <div class="counter-badge">
+        <span id="messageCount">0</span> messages de félicitations
+      </div>
+    </div>
+
+    <!-- Section statistiques -->
+    <div class="stats-container">
+      <div class="stat-item">
+        <span class="stat-number" id="totalMessages">0</span>
+        <span class="stat-label">Messages d'hommage</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">70</span>
+        <span class="stat-label">Ans d'excellence</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">1955</span>
+        <span class="stat-label">Année de fondation</span>
+      </div>
+    </div>
+
+    <!-- Barre de recherche -->
+    <div class="search-container no-print">
+      <div class="search-icon">🔍</div>
+      <input type="text" id="searchInput" class="search-input" placeholder="Rechercher un message ou un auteur...">
+    </div>
+
+    <!-- Filtres et actions -->
+    <div class="no-print flex flex-col md:flex-row justify-between items-center my-8 p-6 bg-white rounded-2xl shadow-lg">
+      <div class="mb-4 md:mb-0">
+        <span class="text-lg font-bold text-primary-blue mr-4">Trier par :</span>
+        <button id="sortByDate" class="filter-btn active" data-sort="date">🕒 Plus récents</button>
+        <button id="sortByAlphabetical" class="filter-btn" data-sort="alphabetical">🔤 Ordre alphabétique</button>
+        <button id="sortByLength" class="filter-btn" data-sort="length">📏 Longueur</button>
+      </div>
+      
+      <div class="flex space-x-4">
+        <button id="printButton" class="btn-primary">
+          🖨️ Imprimer le livre
+        </button>
+        <a href="index.html" class="btn-primary">
+          ← Retour à l'accueil
+        </a>
+      </div>
+    </div>
+
+    <!-- Conteneur des messages -->
+    <section id="testimonialsContainer" class="my-8">
+      <!-- Les messages seront chargés ici dynamiquement -->
+      <div class="empty-state" id="emptyState">
+        <div class="empty-state-icon">📖</div>
+        <h3 class="text-2xl font-bold mb-2">Livre d'or vide</h3>
+        <p class="text-lg">Aucun message n'a encore été publié.</p>
+        <a href="index.html" class="btn-primary mt-4">Soyez le premier à laisser un message</a>
+      </div>
+    </section>
+
+    <!-- Pagination -->
+    <div class="pagination no-print">
+      <button id="prevPage" class="pagination-btn" disabled>← Précédent</button>
+      <span id="pageInfo" class="pagination-info">Page 1 sur 1</span>
+      <button id="nextPage" class="pagination-btn" disabled>Suivant →</button>
+    </div>
+
+    <!-- Signature du développeur -->
+    <div class="developer-signature">
+      <img src="gabby-photo.jpg" alt="Gabby Umba" class="developer-photo">
+      <div class="developer-info">
+        <div class="developer-name">Gabby Umba</div>
+        <div class="developer-role">Développeur</div>
+        <div class="developer-phone">+243 997 227 819</div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Configuration Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDgPSRI8piBCAHKMZ-6fg38ly5aux8yPyU",
+      authDomain: "its-salama.firebaseapp.com",
+      projectId: "its-salama",
+      storageBucket: "its-salama.firebasestorage.app",
+      messagingSenderId: "778202369010",
+      appId: "1:778202369010:web:8bb615f958dd23327eb96b"
+    };
+
+    // Initialisation Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Variables globales
+    let currentPage = 1;
+    const messagesPerPage = 10;
+    let allMessages = [];
+    let filteredMessages = [];
+    let currentSort = 'date';
+    let searchTerm = '';
+
+    // Éléments DOM
+    const testimonialsContainer = document.getElementById('testimonialsContainer');
+    const messageCountElement = document.getElementById('messageCount');
+    const totalMessagesElement = document.getElementById('totalMessages');
+    const emptyState = document.getElementById('emptyState');
+    const prevPageButton = document.getElementById('prevPage');
+    const nextPageButton = document.getElementById('nextPage');
+    const pageInfoElement = document.getElementById('pageInfo');
+    const printButton = document.getElementById('printButton');
+    const searchInput = document.getElementById('searchInput');
+
+    // Générer des particules flottantes
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 25;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+        
+        // Taille aléatoire
+        const size = Math.random() * 20 + 5;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        
+        // Position aléatoire
+        particle.style.left = `${Math.random() * 100}%`;
+        particle.style.top = `${Math.random() * 100}%`;
+        
+        // Délai d'animation aléatoire
+        particle.style.animationDelay = `${Math.random() * 15}s`;
+        
+        // Couleur basée sur les couleurs du thème
+        const colors = [
+          'rgba(30, 58, 138, 0.1)',
+          'rgba(217, 119, 6, 0.1)',
+          'rgba(5, 150, 105, 0.1)'
+        ];
+        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+        
+        particlesContainer.appendChild(particle);
+      }
+    }
+
+    // Charger tous les messages
+    async function loadAllMessages() {
+      try {
+        const snapshot = await db.collection('messages')
+          .orderBy('timestamp', 'desc')
+          .get();
+        
+        allMessages = [];
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          data.id = doc.id;
+          allMessages.push(data);
+        });
+        
+        updateMessageCount();
+        filterMessages();
+        sortMessages(currentSort);
+        displayCurrentPage();
+        
+      } catch (error) {
+        console.error("Erreur lors du chargement des messages:", error);
+        testimonialsContainer.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">❌</div>
+            <h3 class="text-2xl font-bold mb-2">Erreur de chargement</h3>
+            <p class="text-lg">Impossible de charger les messages. Veuillez réessayer plus tard.</p>
+          </div>
+        `;
+      }
+    }
+
+    // Filtrer les messages selon la recherche
+    function filterMessages() {
+      if (!searchTerm) {
+        filteredMessages = [...allMessages];
+      } else {
+        const term = searchTerm.toLowerCase();
+        filteredMessages = allMessages.filter(message => 
+          message.name.toLowerCase().includes(term) || 
+          message.message.toLowerCase().includes(term)
+        );
+      }
+      currentPage = 1;
+      updateMessageCount();
+    }
+
+    // Mettre à jour le compteur de messages
+    function updateMessageCount() {
+      const count = filteredMessages.length;
+      messageCountElement.textContent = count;
+      totalMessagesElement.textContent = allMessages.length;
+      
+      if (count === 0) {
+        emptyState.style.display = 'block';
+      } else {
+        emptyState.style.display = 'none';
+      }
+    }
+
+    // Trier les messages
+    function sortMessages(sortType) {
+      currentSort = sortType;
+      
+      if (sortType === 'date') {
+        filteredMessages.sort((a, b) => {
+          return b.timestamp.toDate() - a.timestamp.toDate();
+        });
+      } else if (sortType === 'alphabetical') {
+        filteredMessages.sort((a, b) => {
+          const nameA = a.name || 'Anonyme';
+          const nameB = b.name || 'Anonyme';
+          return nameA.localeCompare(nameB);
+        });
+      } else if (sortType === 'length') {
+        filteredMessages.sort((a, b) => {
+          return b.message.length - a.message.length;
+        });
+      }
+      
+      currentPage = 1;
+      displayCurrentPage();
+    }
+
+    // Afficher la page courante
+    function displayCurrentPage() {
+      const startIndex = (currentPage - 1) * messagesPerPage;
+      const endIndex = startIndex + messagesPerPage;
+      const pageMessages = filteredMessages.slice(startIndex, endIndex);
+      
+      testimonialsContainer.innerHTML = '';
+      
+      if (pageMessages.length === 0) {
+        testimonialsContainer.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🔍</div>
+            <h3 class="text-2xl font-bold mb-2">Aucun message trouvé</h3>
+            <p class="text-lg">Aucun message ne correspond à votre recherche.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      pageMessages.forEach((message, index) => {
+        const card = createMessageCard(message, index);
+        testimonialsContainer.appendChild(card);
+      });
+      
+      updatePagination();
+    }
+
+    // Créer une carte de message
+    function createMessageCard(message, index) {
+      const card = document.createElement('div');
+      card.className = 'testimonial-card animate-card';
+      card.style.animationDelay = `${index * 100}ms`;
+      
+      const date = message.timestamp ? 
+        message.timestamp.toDate().toLocaleDateString('fr-FR', { 
+          day: '2-digit', 
+          month: 'long', 
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        }) : 'Date inconnue';
+      
+      card.innerHTML = `
+        <div class="testimonial-name">
+          ${message.name || 'Anonyme'}
+        </div>
+        <div class="testimonial-message">
+          ${message.message || ''}
+        </div>
+        <div class="testimonial-footer">
+          <span class="testimonial-signature">${message.name || 'Anonyme'}</span>
+          <span class="testimonial-date">${date}</span>
+        </div>
+      `;
+      
+      return card;
+    }
+
+    // Mettre à jour la pagination
+    function updatePagination() {
+      const totalPages = Math.ceil(filteredMessages.length / messagesPerPage);
+      
+      pageInfoElement.textContent = `Page ${currentPage} sur ${totalPages}`;
+      
+      prevPageButton.disabled = currentPage === 1;
+      nextPageButton.disabled = currentPage === totalPages || totalPages === 0;
+    }
+
+    // Événements
+    document.getElementById('sortByDate').addEventListener('click', () => {
+      document.getElementById('sortByDate').classList.add('active');
+      document.getElementById('sortByAlphabetical').classList.remove('active');
+      document.getElementById('sortByLength').classList.remove('active');
+      sortMessages('date');
+    });
+
+    document.getElementById('sortByAlphabetical').addEventListener('click', () => {
+      document.getElementById('sortByAlphabetical').classList.add('active');
+      document.getElementById('sortByDate').classList.remove('active');
+      document.getElementById('sortByLength').classList.remove('active');
+      sortMessages('alphabetical');
+    });
+
+    document.getElementById('sortByLength').addEventListener('click', () => {
+      document.getElementById('sortByLength').classList.add('active');
+      document.getElementById('sortByDate').classList.remove('active');
+      document.getElementById('sortByAlphabetical').classList.remove('active');
+      sortMessages('length');
+    });
+
+    prevPageButton.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        displayCurrentPage();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+
+    nextPageButton.addEventListener('click', () => {
+      const totalPages = Math.ceil(filteredMessages.length / messagesPerPage);
+      if (currentPage < totalPages) {
+        currentPage++;
+        displayCurrentPage();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+
+    printButton.addEventListener('click', () => {
+      window.print();
+    });
+
+    searchInput.addEventListener('input', (e) => {
+      searchTerm = e.target.value.trim();
+      filterMessages();
+      sortMessages(currentSort);
+    });
+
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', () => {
+      loadAllMessages();
+      createParticles();
+    });
+  </script>
+</body>
+</html>
