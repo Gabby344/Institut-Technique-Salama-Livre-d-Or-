@@ -36,26 +36,111 @@
       margin: 0;
       padding: 0;
       min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    /* Bannière défilante inspirée des marquees CSS [citation:5] */
+    /* Animation d'ouverture du livre avec effet 3D amélioré */
+    .book-container {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, var(--primary-blue), #0f1a3d);
+      z-index: 9999;
+      transition: opacity 1s ease-in-out, visibility 1s ease-in-out;
+    }
+    .book-container.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+    .book { 
+      width: 320px; 
+      height: 480px; 
+      position: relative; 
+      transform-style: preserve-3d;
+      perspective: 2000px;
+    }
+    .front, .back, .page {
+      position: absolute; 
+      width: 100%; 
+      height: 100%;
+      border-radius: 12px; 
+      transform-origin: left center;
+      transition: transform 2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    }
+    .front {
+      background: linear-gradient(145deg, var(--primary-blue), #0f1a3d, #3730a3);
+      color: white; 
+      z-index: 10;
+      text-align: center; 
+      padding: 40px 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border: 2px solid var(--secondary-gold);
+    }
+    .cover-logo {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 5px solid var(--secondary-gold);
+      margin-bottom: 25px;
+      box-shadow: 0 0 25px rgba(217, 119, 6, 0.7);
+      filter: brightness(1.1);
+    }
+    .book-title { 
+      font-family: 'Playfair Display', serif; 
+      font-size: 2.2rem; 
+      color: var(--secondary-gold); 
+      text-transform: uppercase; 
+      margin-bottom: 8px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      letter-spacing: 2px;
+    }
+    .book-subtitle { 
+      font-size: 1.1rem; 
+      font-style: italic; 
+      color: #eaeaea; 
+      margin-bottom: 12px;
+      text-shadow: 0 1px 5px rgba(0,0,0,0.3);
+    }
+    .book.open .front { transform: rotateY(-180deg); }
+    .book.open .page { transform: rotateY(-175deg); }
+
+    /* Bannière défilante avec effet de brillance */
     .marquee-banner {
-      background: linear-gradient(90deg, var(--primary-blue), var(--accent-green), var(--secondary-gold));
+      background: linear-gradient(90deg, 
+        var(--primary-blue), 
+        #2563eb, 
+        var(--accent-green), 
+        #10b981, 
+        var(--secondary-gold), 
+        #f59e0b,
+        var(--primary-blue));
+      background-size: 400% 100%;
       color: white;
-      padding: 1rem 0;
+      padding: 1.2rem 0;
       overflow: hidden;
       white-space: nowrap;
       position: relative;
-      font-weight: 700;
-      font-size: 1.4rem;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      font-weight: 800;
+      font-size: 1.5rem;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.4);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      animation: gradient-shift 8s ease infinite;
+    }
+
+    @keyframes gradient-shift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     .marquee-content {
       display: inline-block;
       padding-left: 100%;
-      animation: defilement-rtl 25s infinite linear;
+      animation: defilement-rtl 20s infinite linear;
     }
 
     @keyframes defilement-rtl {
@@ -63,50 +148,78 @@
       100% { transform: translate3d(-100%,0,0); }
     }
 
-    /* Autocollant festif inspiré des CSS Stickers [citation:7] */
+    /* Autocollant festif avec effet brillant */
     .sticker-anniversaire {
       position: relative;
       display: inline-block;
-      background: linear-gradient(135deg, var(--secondary-gold), #f59e0b);
+      background: linear-gradient(135deg, var(--secondary-gold), #f59e0b, #fbbf24);
       color: white;
-      padding: 1.5rem 2rem;
+      padding: 1.8rem 2.5rem;
       border-radius: 50% 50% 50% 0;
       transform: rotate(-5deg);
-      box-shadow: 0 10px 25px rgba(217, 119, 6, 0.4);
+      box-shadow: 0 15px 30px rgba(217, 119, 6, 0.5), 
+                  0 0 0 1px rgba(255,255,255,0.2) inset,
+                  0 0 20px rgba(255,215,0,0.4) inset;
       margin: 2rem auto;
       font-family: 'Playfair Display', serif;
-      font-size: 1.8rem;
+      font-size: 2rem;
       text-align: center;
       z-index: 10;
+      animation: sticker-pulse 3s infinite alternate;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+
+    @keyframes sticker-pulse {
+      0% { transform: rotate(-5deg) scale(1); }
+      100% { transform: rotate(-5deg) scale(1.05); }
     }
 
     .sticker-anniversaire::after {
       content: "";
       position: absolute;
-      bottom: -10px;
-      right: -10px;
-      width: 50px;
-      height: 50px;
-      background: radial-gradient(circle at top left, transparent 70%, rgba(0,0,0,0.1) 70%);
+      bottom: -12px;
+      right: -12px;
+      width: 60px;
+      height: 60px;
+      background: radial-gradient(circle at top left, transparent 70%, rgba(0,0,0,0.15) 70%);
     }
 
-    /* Carousel amélioré */
+    /* Carousel amélioré avec effet de brillance */
     .hero {
       position: relative;
-      height: 50vh;
-      max-height: 500px;
-      min-height: 350px;
+      height: 55vh;
+      max-height: 550px;
+      min-height: 400px;
       overflow: hidden;
-      border-radius: 15px;
-      margin: 2rem auto;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+      border-radius: 20px;
+      margin: 2.5rem auto;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      border: 3px solid transparent;
+      background: linear-gradient(135deg, var(--primary-blue), var(--accent-green), var(--secondary-gold));
+      background-size: 400% 400%;
+      animation: gradient-border 8s ease infinite;
+      padding: 4px;
+    }
+
+    @keyframes gradient-border {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .carousel-container {
+      width: 100%;
+      height: 100%;
+      border-radius: 18px;
+      overflow: hidden;
+      position: relative;
     }
 
     .carousel {
       display: flex;
       width: 100%;
       height: 100%;
-      transition: transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      transition: transform 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
 
     .carousel-item {
@@ -120,83 +233,337 @@
       height: 100%;
       object-fit: cover;
       object-position: center;
-      filter: brightness(0.9);
+      filter: brightness(0.85);
+      transition: transform 8s ease;
+    }
+
+    .carousel-item:hover .hero-img {
+      transform: scale(1.05);
     }
 
     .hero-text {
       position: absolute;
       inset: 0;
-      background: linear-gradient(135deg, rgba(30, 58, 138, 0.8), rgba(5, 150, 105, 0.7));
+      background: linear-gradient(135deg, rgba(30, 58, 138, 0.75), rgba(5, 150, 105, 0.7));
       color: white;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       text-align: center;
-      padding: 2rem;
+      padding: 2.5rem;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
     }
 
-    /* Formulaire stylisé */
+    /* Section historique avec effet de carte */
+    .history-timeline {
+      background: linear-gradient(135deg, #ffffff, #f8fafc);
+      border-radius: 20px;
+      padding: 3rem;
+      margin: 3.5rem auto;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+      border-left: 8px solid var(--secondary-gold);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .history-timeline::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(90deg, var(--primary-blue), var(--accent-green), var(--secondary-gold));
+    }
+
+    .timeline-item {
+      margin-bottom: 2.5rem;
+      padding-bottom: 2rem;
+      border-bottom: 2px dashed #e2e8f0;
+      position: relative;
+      padding-left: 2.5rem;
+    }
+
+    .timeline-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.5rem;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--secondary-gold);
+      box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.2);
+    }
+
+    /* Formulaire stylisé avec effets de brillance */
     #testimonialForm {
-      background: white;
-      border-top: 6px solid var(--primary-blue);
-      padding: 2.5rem;
-      margin: 2rem auto;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      background: linear-gradient(135deg, #ffffff, #f8fafc);
+      border-top: 8px solid;
+      border-image: linear-gradient(90deg, var(--primary-blue), var(--accent-green), var(--secondary-gold)) 1;
+      padding: 3rem;
+      margin: 3rem auto;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
       max-width: 800px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #testimonialForm::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-blue), var(--accent-green), var(--secondary-gold));
     }
 
     #testimonialForm label {
       display: block;
       font-weight: 700;
       color: var(--primary-blue);
-      font-size: 1.1rem;
-      margin-bottom: 8px;
-      margin-top: 1.5rem;
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      margin-top: 2rem;
     }
 
     #testimonialForm input,
     #testimonialForm textarea {
       width: 100%;
-      padding: 1rem;
+      padding: 1.2rem 1.5rem;
       border: 2px solid #e2e8f0;
-      border-radius: 10px;
-      font-size: 1rem;
+      border-radius: 12px;
+      font-size: 1.1rem;
       font-family: 'Merriweather', serif;
-      transition: all 0.3s ease;
+      transition: all 0.4s ease;
       background: #f8fafc;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05) inset;
     }
 
     #testimonialForm input:focus,
     #testimonialForm textarea:focus {
       border-color: var(--secondary-gold);
-      box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
+      box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.2), 0 4px 15px rgba(0,0,0,0.1) inset;
       outline: none;
       background: white;
+      transform: translateY(-2px);
     }
 
     .btn-primary {
       background: linear-gradient(135deg, var(--primary-blue), #3730a3);
       color: white;
-      font-weight: 700;
+      font-weight: 800;
       border: none;
       border-radius: 50px;
-      padding: 1rem 2rem;
-      font-size: 1.1rem;
+      padding: 1.2rem 2.5rem;
+      font-size: 1.2rem;
       cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 6px 20px rgba(30, 58, 138, 0.4);
+      transition: all 0.4s ease;
+      box-shadow: 0 8px 25px rgba(30, 58, 138, 0.4);
+      position: relative;
+      overflow: hidden;
+      letter-spacing: 1px;
+    }
+
+    .btn-primary::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.7s;
     }
 
     .btn-primary:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 25px rgba(30, 58, 138, 0.6);
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(30, 58, 138, 0.6);
+    }
+
+    .btn-primary:hover::before {
+      left: 100%;
+    }
+
+    /* Modale améliorée */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+      z-index: 10000;
+      backdrop-filter: blur(5px);
+    }
+    .modal-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .modal-content {
+      background: white;
+      padding: 3rem;
+      border-radius: 20px;
+      text-align: center;
+      max-width: 450px;
+      width: 90%;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+      transform: scale(0.9);
+      transition: transform 0.4s ease;
+      border-top: 6px solid var(--secondary-gold);
+    }
+    
+    .modal-overlay.open .modal-content {
+      transform: scale(1);
+    }
+
+    /* Effet de particules flottantes */
+    .floating-particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
+    
+    .particle {
+      position: absolute;
+      background: rgba(217, 119, 6, 0.1);
+      border-radius: 50%;
+      animation: float 15s infinite linear;
+    }
+    
+    @keyframes float {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Section statistiques */
+    .stats-container {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      margin: 3rem 0;
+    }
+    
+    .stat-item {
+      text-align: center;
+      padding: 1.5rem;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      margin: 1rem;
+      flex: 1;
+      min-width: 200px;
+      border-top: 4px solid var(--secondary-gold);
+    }
+    
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--primary-blue);
+      display: block;
+    }
+    
+    .stat-label {
+      font-size: 1rem;
+      color: #64748b;
+      margin-top: 0.5rem;
+    }
+
+    /* Signature du développeur */
+    .developer-signature {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 3rem;
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .developer-photo {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--secondary-gold);
+      margin-right: 1rem;
+    }
+    
+    .developer-info {
+      text-align: left;
+    }
+    
+    .developer-name {
+      font-weight: 700;
+      color: var(--primary-blue);
+      font-size: 1rem;
+    }
+    
+    .developer-role {
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+    
+    .developer-phone {
+      color: var(--accent-green);
+      font-size: 0.85rem;
+      margin-top: 0.2rem;
     }
   </style>
 </head>
 
 <body>
+  <!-- Animation d'ouverture -->
+  <div id="bookCoverAnimation" class="book-container">
+    <div class="book">
+      <div class="page"></div>
+      <div class="front">
+        <img src="logoits.jpg" alt="Logo ITS Salama" class="cover-logo">
+        <h2 class="book-title">Livre d'Or</h2>
+        <p class="book-subtitle">70ème Anniversaire</p>
+        <p class="book-subtitle">1955-2025</p>
+        <div style="margin-top: 20px; font-size: 0.9rem;">
+          Institut Technique Salama<br>Don Bosco
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Particules flottantes -->
+  <div class="floating-particles" id="particles"></div>
+
   <!-- Bannière défilante -->
   <div class="marquee-banner">
     <div class="marquee-content">
@@ -212,61 +579,111 @@
     <div class="text-center">
       <div class="sticker-anniversaire">
         <div>70 Ans</div>
-        <div style="font-size: 1.2rem;">ITS Salama</div>
+        <div style="font-size: 1.4rem;">ITS Salama</div>
       </div>
       
-      <h1 class="text-5xl font-bold mt-4 mb-4" style="color: var(--primary-blue); font-family: 'Playfair Display', serif;">
+      <h1 class="text-5xl md:text-6xl font-bold mt-6 mb-6" style="color: var(--primary-blue); font-family: 'Playfair Display', serif;">
         Livre d'Or du 70<sup>ème</sup> Anniversaire
       </h1>
-      <p class="text-xl text-gray-700 max-w-3xl mx-auto">
+      <p class="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
         Célébrez avec nous 70 ans d'éducation, de formation technique et d'excellence à l'Institut Technique Salama de Don Bosco
       </p>
     </div>
 
+    <!-- Section statistiques -->
+    <div class="stats-container">
+      <div class="stat-item">
+        <span class="stat-number" id="totalMessages">0</span>
+        <span class="stat-label">Messages d'hommage</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">70</span>
+        <span class="stat-label">Ans d'excellence</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">1955</span>
+        <span class="stat-label">Année de fondation</span>
+      </div>
+    </div>
+
+    <!-- Section historique -->
+    <section class="history-timeline">
+      <h2 class="text-3xl md:text-4xl font-bold text-center mb-10" style="color: var(--primary-blue); font-family: 'Playfair Display', serif;">
+        Notre Histoire Prestigieuse
+      </h2>
+      
+      <div class="timeline-item">
+        <h3 class="text-xl md:text-2xl font-bold mb-3" style="color: var(--secondary-gold);">1955 - Fondation</h3>
+        <p class="text-gray-700 text-lg">L'Institut Technique Salama ouvre ses portes le 11 octobre 1955 sous le nom d'École Professionnelle Officielle des Métiers (EPOM). 92 jeunes sont accueillis dans trois sections : mécanique-auto, menuiserie et maçonnerie.</p>
+      </div>
+
+      <div class="timeline-item">
+        <h3 class="text-xl md:text-2xl font-bold mb-3" style="color: var(--secondary-gold);">1960 - Expansion</h3>
+        <p class="text-gray-700 text-lg">Lancement de la section Électricité et développement des cycles techniques secondaires. L'école compte 243 élèves à l'aube de l'Indépendance du Congo.</p>
+      </div>
+
+      <div class="timeline-item">
+        <h3 class="text-xl md:text-2xl font-bold mb-3" style="color: var(--secondary-gold);">1974 - Nouveau nom</h3>
+        <p class="text-gray-700 text-lg">L'école devient "Institut Technique et Professionnel Salama". Le nom "Salama" signifie "paix" en swahili, reflétant l'esprit de l'établissement.</p>
+      </div>
+
+      <div class="timeline-item">
+        <h3 class="text-xl md:text-2xl font-bold mb-3" style="color: var(--secondary-gold);">2024 - Visite du Recteur Majeur</h3>
+        <p class="text-gray-700 text-lg">Le Cardinal Ángel Fernández Artime, Xe successeur de Don Bosco, visite l'institut et rencontre les jeunes.</p>
+      </div>
+
+      <div class="timeline-item">
+        <h3 class="text-xl md:text-2xl font-bold mb-3" style="color: var(--secondary-gold);">2025 - 70ème Anniversaire</h3>
+        <p class="text-gray-700 text-lg">Célébration solennelle des 70 ans d'existence avec la devise : "Remercier, Repenser, Redynamiser, Relancer".</p>
+      </div>
+    </section>
+
     <!-- Carousel des photos -->
     <section class="hero">
-      <div class="carousel" id="heroCarousel">
-        <div class="carousel-item">
-          <img src="logoits.jpg" alt="Logo ITS Salama" class="hero-img">
+      <div class="carousel-container">
+        <div class="carousel" id="heroCarousel">
+          <div class="carousel-item">
+            <img src="logoits.jpg" alt="Logo ITS Salama" class="hero-img">
+          </div>
+          <div class="carousel-item">
+            <img src="a-its-profession-perpétuelle-de-neuf-salesiens-de-don-bosco-d-afrique-centrale.jpg" alt="Profession perpétuelle" class="hero-img">
+          </div>
+          <div class="carousel-item">
+            <img src="don-bosco-pere-de-la-jeunesse.jpg" alt="Don Bosco" class="hero-img">
+          </div>
+          <div class="carousel-item">
+            <img src="hommage-au-pere-isaac-kamiba-recent-ancien-prefet.jpg" alt="Hommage Père Isaac" class="hero-img">
+          </div>
+          <div class="carousel-item">
+            <img src="lacoursducycleinferieur.jpg" alt="Cour de l'établissement" class="hero-img">
+          </div>
+          <div class="carousel-item">
+            <img src="lemissionnaireedwinseminarioetleseleves.jpg" alt="Missionnaire et élèves" class="hero-img">
+          </div>
+          <div class="carousel-item">
+            <img src="leseleves1.jpg" alt="Élèves de l'ITS" class="hero-img">
+          </div>
+          <div class="carousel-item">
+            <img src="recteurmajeureteleves.jpg" alt="Recteur majeur et élèves" class="hero-img">
+          </div>
+          <div class="carousel-item">
+            <img src="unemesse.jpg" alt="Célébration eucharistique" class="hero-img">
+          </div>
+          <div class="carousel-item">
+            <img src="visite-a-udbl.jpg" alt="Visite UDBL" class="hero-img">
+          </div>
         </div>
-        <div class="carousel-item">
-          <img src="a-its-profession-perpétuelle-de-neuf-salesiens-de-don-bosco-d-afrique-centrale.jpg" alt="Profession perpétuelle" class="hero-img">
+        <div class="hero-text">
+          <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">70 Ans de Passion Éducative</h1>
+          <p class="text-xl md:text-2xl lg:text-3xl italic">« Former la jeunesse dans l'esprit de Don Bosco »</p>
         </div>
-        <div class="carousel-item">
-          <img src="don-bosco-pere-de-la-jeunesse.jpg" alt="Don Bosco" class="hero-img">
-        </div>
-        <div class="carousel-item">
-          <img src="hommage-au-pere-isaac-kamiba-recent-ancien-prefet.jpg" alt="Hommage Père Isaac" class="hero-img">
-        </div>
-        <div class="carousel-item">
-          <img src="lacoursducycleinferieur.jpg" alt="Cour de l'établissement" class="hero-img">
-        </div>
-        <div class="carousel-item">
-          <img src="lemissionnaireedwinseminarioetleseleves.jpg" alt="Missionnaire et élèves" class="hero-img">
-        </div>
-        <div class="carousel-item">
-          <img src="leseleves1.jpg" alt="Élèves de l'ITS" class="hero-img">
-        </div>
-        <div class="carousel-item">
-          <img src="recteurmajeureteleves.jpg" alt="Recteur majeur et élèves" class="hero-img">
-        </div>
-        <div class="carousel-item">
-          <img src="unemesse.jpg" alt="Célébration eucharistique" class="hero-img">
-        </div>
-        <div class="carousel-item">
-          <img src="visite-a-udbl.jpg" alt="Visite UDBL" class="hero-img">
-        </div>
-      </div>
-      <div class="hero-text">
-        <h1 class="text-4xl md:text-5xl font-bold mb-4">70 Ans de Passion Éducative</h1>
-        <p class="text-xl md:text-2xl italic">« Former la jeunesse dans l'esprit de Don Bosco »</p>
       </div>
     </section>
 
     <!-- Section du formulaire -->
-    <section class="my-12">
-      <h2 class="text-3xl font-bold text-center mb-8" style="color: var(--primary-blue);">
-        <span class="text-4xl mr-2">✍️</span> Laissez votre message d'hommage
+    <section class="my-16">
+      <h2 class="text-3xl md:text-4xl font-bold text-center mb-10" style="color: var(--primary-blue);">
+        <span class="text-4xl md:text-5xl mr-3">✍️</span> Laissez votre message d'hommage
       </h2>
 
       <form id="testimonialForm">
@@ -276,30 +693,54 @@
         <label for="message">Votre témoignage :</label>
         <textarea id="message" rows="6" placeholder="Ex: C'est avec une grande émotion que je me souviens de mes années à l'ITS Salama. La qualité de l'enseignement technique..." required></textarea>
 
-        <div id="errorMessage" class="text-red-600 font-bold mt-3 text-center" style="display:none;"></div>
+        <div id="errorMessage" class="text-red-600 font-bold mt-4 text-center text-lg" style="display:none;"></div>
         
-        <div class="text-center mt-6">
+        <div class="text-center mt-8">
           <button type="submit" class="btn-primary">
             🎊 Publier mon Témoignage
           </button>
         </div>
+        
+        <div class="text-center mt-6 text-gray-600">
+          <p>Chaque personne peut publier jusqu'à 2 messages maximum</p>
+        </div>
       </form>
 
-      <div class="text-center mt-8">
+      <div class="text-center mt-10">
         <a href="livre.html" class="btn-primary inline-block">
           📖 Voir tous les messages du Livre d'Or
         </a>
       </div>
     </section>
+
+    <!-- Signature du développeur -->
+    <div class="developer-signature">
+      <img src="profil.jpeg" alt="Gabby Umba" class="developer-photo">
+      <div class="developer-info">
+        <div class="developer-name">Gabby Umba</div>
+        <div class="developer-role">Développeur</div>
+        <div class="developer-phone">+243 997 227 819</div>
+      </div>
+    </div>
   </main>
 
   <!-- Modale de succès -->
-  <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-    <div class="bg-white p-8 rounded-lg text-center max-w-md mx-4">
-      <div class="text-6xl mb-4">🎉</div>
-      <h3 class="text-2xl font-bold mb-2">Message enregistré !</h3>
-      <p class="mb-4">Votre témoignage a été ajouté au livre d'or. Merci pour votre contribution !</p>
+  <div id="successModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="text-6xl mb-6">🎉</div>
+      <h3 class="text-2xl md:text-3xl font-bold mb-4">Message enregistré !</h3>
+      <p class="mb-6 text-lg">Votre témoignage a été ajouté au livre d'or. Merci pour votre contribution !</p>
       <button onclick="closeModal()" class="btn-primary">Continuer</button>
+    </div>
+  </div>
+
+  <!-- Modale d'erreur (limite atteinte) -->
+  <div id="limitModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="text-6xl mb-6">⚠️</div>
+      <h3 class="text-2xl md:text-3xl font-bold mb-4">Limite atteinte</h3>
+      <p class="mb-6 text-lg">Vous avez déjà publié le nombre maximum de messages autorisés (Au moins 2 messages par personne).</p>
+      <button onclick="closeModal('limitModal')" class="btn-primary">Compris</button>
     </div>
   </div>
 
@@ -317,6 +758,78 @@
     // Initialisation Firebase
     const app = firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+
+    // Variables globales
+    let userMessageCount = 0;
+    const MAX_MESSAGES_PER_USER = 2;
+
+    // Générer des particules flottantes
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 30;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+        
+        // Taille aléatoire
+        const size = Math.random() * 20 + 5;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        
+        // Position aléatoire
+        particle.style.left = `${Math.random() * 100}%`;
+        particle.style.top = `${Math.random() * 100}%`;
+        
+        // Délai d'animation aléatoire
+        particle.style.animationDelay = `${Math.random() * 15}s`;
+        
+        // Couleur basée sur les couleurs du thème
+        const colors = [
+          'rgba(30, 58, 138, 0.1)',
+          'rgba(217, 119, 6, 0.1)',
+          'rgba(5, 150, 105, 0.1)'
+        ];
+        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+        
+        particlesContainer.appendChild(particle);
+      }
+    }
+
+    // Vérifier le nombre de messages de l'utilisateur
+    async function checkUserMessageCount(name) {
+      try {
+        // Utiliser une méthode simple basée sur le nom pour limiter les messages
+        // Dans une vraie application, vous utiliseriez l'authentification Firebase
+        const snapshot = await db.collection('messages')
+          .where('name', '==', name)
+          .get();
+        
+        return snapshot.size;
+      } catch (error) {
+        console.error("Erreur lors de la vérification:", error);
+        return 0;
+      }
+    }
+
+    // Compter le nombre total de messages
+    async function updateTotalMessageCount() {
+      try {
+        const snapshot = await db.collection('messages').get();
+        document.getElementById('totalMessages').textContent = snapshot.size;
+      } catch (error) {
+        console.error("Erreur lors du comptage des messages:", error);
+      }
+    }
+
+    // Animation du livre d'ouverture
+    const book = document.querySelector('.book');
+    setTimeout(() => { book.classList.add('open'); }, 1000);
+    setTimeout(() => {
+      document.getElementById('bookCoverAnimation').classList.add('hide');
+      createParticles();
+      updateTotalMessageCount();
+    }, 3000);
 
     // Carousel automatique
     const carousel = document.getElementById('heroCarousel');
@@ -345,27 +858,44 @@
       errorMessage.style.display = 'none';
 
       try {
+        // Vérifier le nombre de messages de l'utilisateur
+        const userMessages = await checkUserMessageCount(name);
+        
+        if (userMessages >= MAX_MESSAGES_PER_USER) {
+          document.getElementById('limitModal').classList.add('open');
+          return;
+        }
+
         // Sauvegarde dans Firebase
         await db.collection('messages').add({
           name: name,
           message: message,
           timestamp: new Date(),
-          approved: true
+          approved: true,
+          userIdentifier: name.toLowerCase().replace(/\s+/g, '') // Identifiant simple basé sur le nom
         });
 
         // Confettis et message de succès
-        confetti({ particleCount: 150, spread: 70 });
-        document.getElementById('successModal').classList.remove('hidden');
+        confetti({ 
+          particleCount: 200, 
+          spread: 80,
+          origin: { y: 0.6 },
+          colors: ['#1E3A8A', '#D97706', '#059669']
+        });
+        
+        document.getElementById('successModal').classList.add('open');
         e.target.reset();
+        updateTotalMessageCount();
         
       } catch (error) {
         console.error("Erreur Firebase:", error);
-        alert("Une erreur est survenue. Veuillez réessayer.");
+        errorMessage.style.display = 'block';
+        errorMessage.textContent = "Une erreur est survenue. Veuillez réessayer.";
       }
     });
 
-    function closeModal() {
-      document.getElementById('successModal').classList.add('hidden');
+    function closeModal(modalId = 'successModal') {
+      document.getElementById(modalId).classList.remove('open');
     }
   </script>
 </body>
