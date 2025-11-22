@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Administration - Livre d'Or 70 Ans ITS Salama</title>
+
+  <!-- Frameworks et polices -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+  
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore-compat.js"></script>
+
+  <style>
+    :root {
+      --primary-blue: #1E3A8A;
+      --secondary-gold: #D97706;
+      --accent-green: #059669;
+    }
+
+    body {
+      font-family: 'Merriweather', serif;
+      background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+      color: #1e293b;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    .admin-header {
+      background: linear-gradient(135deg, var(--primary-blue), #0f1a3d);
+      color: white;
+      padding: 2rem 0;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 15px;
+      padding: 1.5rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      text-align: center;
+      border-top: 4px solid var(--secondary-gold);
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--primary-blue);
+      display: block;
+    }
+
+    .message-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      border-left: 4px solid var(--accent-green);
+      transition: all 0.3s ease;
+    }
+
+    .message-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-danger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(220, 38, 38, 0.4);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-blue), #3730a3);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(30, 58, 138, 0.4);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+      z-index: 10000;
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      transform: scale(0.9);
+      transition: transform 0.4s ease;
+    }
+    
+    .modal-overlay.open .modal-content {
+      transform: scale(1);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- En-tête admin -->
+  <header class="admin-header">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-3xl md:text-4xl font-bold">🔧 Administration</h1>
+          <p class="text-lg opacity-90">Livre d'Or - 70 Ans ITS Salama</p>
+        </div>
+        <div class="flex space-x-4">
+          <button onclick="window.location.href='index.html'" class="btn-primary">
+            ← Retour au site
+          </button>
+          <button onclick="logout()" class="btn-danger">
+            🚪 Déconnexion
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <!-- Statistiques -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div class="stat-card">
+        <span class="stat-number" id="totalMessages">0</span>
+        <span class="text-gray-600">Messages totaux</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" id="todayMessages">0</span>
+        <span class="text-gray-600">Messages aujourd'hui</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" id="lastWeekMessages">0</span>
+        <span class="text-gray-600">7 derniers jours</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" id="avgMessageLength">0</span>
+        <span class="text-gray-600">Caractères/message</span>
+      </div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+      <h2 class="text-2xl font-bold mb-4" style="color: var(--primary-blue);">Actions Rapides</h2>
+      <div class="flex flex-wrap gap-4">
+        <button onclick="exportMessages()" class="btn-primary">
+          📤 Exporter les messages
+        </button>
+        <button onclick="showSettingsModal()" class="btn-primary">
+          ⚙️ Paramètres du site
+        </button>
+        <button onclick="clearAllMessages()" class="btn-danger">
+          🗑️ Tout supprimer
+        </button>
+      </div>
+    </div>
+
+    <!-- Recherche et filtres -->
+    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+      <div class="flex flex-col md:flex-row gap-4 items-center">
+        <div class="flex-1">
+          <input type="text" id="searchAdmin" placeholder="Rechercher un message ou un auteur..." 
+                 class="w-full p-3 border border-gray-300 rounded-lg">
+        </div>
+        <div class="flex gap-2">
+          <select id="sortAdmin" class="p-3 border border-gray-300 rounded-lg">
+            <option value="newest">Plus récents</option>
+            <option value="oldest">Plus anciens</option>
+            <option value="name">Nom (A-Z)</option>
+          </select>
+          <button onclick="filterMessages()" class="btn-primary">
+            🔍 Filtrer
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Liste des messages -->
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+      <h2 class="text-2xl font-bold mb-4" style="color: var(--primary-blue);">
+        Gestion des Messages (<span id="messageCount">0</span>)
+      </h2>
+      <div id="messagesList" class="max-h-96 overflow-y-auto">
+        <!-- Les messages seront chargés ici -->
+      </div>
+    </div>
+  </main>
+
+  <!-- Modale de confirmation de suppression -->
+  <div id="deleteModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="text-4xl mb-4 text-center">⚠️</div>
+      <h3 class="text-xl font-bold mb-4 text-center">Confirmer la suppression</h3>
+      <p class="mb-6 text-center">Êtes-vous sûr de vouloir supprimer ce message ? Cette action est irréversible.</p>
+      <div class="flex gap-4">
+        <button onclick="confirmDelete()" class="btn-danger flex-1">🗑️ Supprimer</button>
+        <button onclick="closeModal('deleteModal')" class="btn-primary flex-1">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modale de paramètres -->
+  <div id="settingsModal" class="modal-overlay">
+    <div class="modal-content">
+      <h3 class="text-xl font-bold mb-4" style="color: var(--primary-blue);">Paramètres du Site</h3>
+      <form id="settingsForm">
+        <div class="mb-4">
+          <label class="block font-bold mb-2">Limite de messages par personne:</label>
+          <input type="number" id="messageLimit" class="w-full p-3 border border-gray-300 rounded-lg" min="1" max="10">
+        </div>
+        <div class="mb-4">
+          <label class="block font-bold mb-2">Titre du site:</label>
+          <input type="text" id="siteTitle" class="w-full p-3 border border-gray-300 rounded-lg">
+        </div>
+        <div class="mb-4">
+          <label class="block font-bold mb-2">Description:</label>
+          <textarea id="siteDescription" class="w-full p-3 border border-gray-300 rounded-lg" rows="3"></textarea>
+        </div>
+        <div class="flex gap-4">
+          <button type="submit" class="btn-primary flex-1">💾 Sauvegarder</button>
+          <button type="button" onclick="closeModal('settingsModal')" class="btn-primary flex-1" style="background: #6b7280;">Annuler</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Configuration Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDgPSRI8piBCAHKMZ-6fg38ly5aux8yPyU",
+      authDomain: "its-salama.firebaseapp.com",
+      projectId: "its-salama",
+      storageBucket: "its-salama.firebasestorage.app",
+      messagingSenderId: "778202369010",
+      appId: "1:778202369010:web:8bb615f958dd23327eb96b"
+    };
+
+    // Initialisation Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Variables globales
+    let allMessages = [];
+    let filteredMessages = [];
+    let messageToDelete = null;
+
+    // Vérifier l'authentification
+    function checkAuth() {
+      if (!localStorage.getItem('adminAuthenticated')) {
+        window.location.href = 'index.html';
+      }
+    }
+
+    // Déconnexion
+    function logout() {
+      localStorage.removeItem('adminAuthenticated');
+      window.location.href = 'index.html';
+    }
+
+    // Charger les statistiques
+    async function loadStats() {
+      try {
+        const snapshot = await db.collection('messages').get();
+        const messages = [];
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          data.id = doc.id;
+          messages.push(data);
+        });
+
+        allMessages = messages;
+        filteredMessages = [...messages];
+
+        // Statistiques de base
+        document.getElementById('totalMessages').textContent = messages.length;
+        document.getElementById('messageCount').textContent = messages.length;
+
+        // Messages d'aujourd'hui
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayMessages = messages.filter(msg => 
+          msg.timestamp.toDate() >= today
+        );
+        document.getElementById('todayMessages').textContent = todayMessages.length;
+
+        // Messages des 7 derniers jours
+        const lastWeek = new Date();
+        lastWeek.setDate(lastWeek.getDate() - 7);
+        const lastWeekMessages = messages.filter(msg => 
+          msg.timestamp.toDate() >= lastWeek
+        );
+        document.getElementById('lastWeekMessages').textContent = lastWeekMessages.length;
+
+        // Longueur moyenne des messages
+        const totalChars = messages.reduce((sum, msg) => sum + (msg.message?.length || 0), 0);
+        const avgLength = messages.length > 0 ? Math.round(totalChars / messages.length) : 0;
+        document.getElementById('avgMessageLength').textContent = avgLength;
+
+        displayMessages();
+
+      } catch (error) {
+        console.error("Erreur lors du chargement:", error);
+      }
+    }
+
+    // Afficher les messages
+    function displayMessages() {
+      const container = document.getElementById('messagesList');
+      
+      if (filteredMessages.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 text-gray-500">
+            <div class="text-6xl mb-4">📭</div>
+            <p>Aucun message à afficher</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filteredMessages.map(message => `
+        <div class="message-card">
+          <div class="flex justify-between items-start mb-3">
+            <div class="flex-1">
+              <h4 class="font-bold text-lg" style="color: var(--primary-blue);">
+                ${message.name || 'Anonyme'}
+              </h4>
+              <p class="text-sm text-gray-600">
+                ${message.timestamp?.toDate().toLocaleDateString('fr-FR', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                }) || 'Date inconnue'}
+              </p>
+            </div>
+            <button onclick="openDeleteModal('${message.id}')" class="btn-danger ml-4">
+              🗑️ Supprimer
+            </button>
+          </div>
+          <p class="text-gray-700 bg-gray-50 p-3 rounded-lg">${message.message || ''}</p>
+        </div>
+      `).join('');
+    }
+
+    // Filtrer les messages
+    function filterMessages() {
+      const searchTerm = document.getElementById('searchAdmin').value.toLowerCase();
+      const sortBy = document.getElementById('sortAdmin').value;
+
+      filteredMessages = allMessages.filter(message => 
+        message.name?.toLowerCase().includes(searchTerm) || 
+        message.message?.toLowerCase().includes(searchTerm)
+      );
+
+      // Trier
+      switch (sortBy) {
+        case 'newest':
+          filteredMessages.sort((a, b) => b.timestamp.toDate() - a.timestamp.toDate());
+          break;
+        case 'oldest':
+          filteredMessages.sort((a, b) => a.timestamp.toDate() - b.timestamp.toDate());
+          break;
+        case 'name':
+          filteredMessages.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+          break;
+      }
+
+      document.getElementById('messageCount').textContent = filteredMessages.length;
+      displayMessages();
+    }
+
+    // Ouvrir la modale de suppression
+    function openDeleteModal(messageId) {
+      messageToDelete = messageId;
+      document.getElementById('deleteModal').classList.add('open');
+    }
+
+    // Confirmer la suppression
+    async function confirmDelete() {
+      if (!messageToDelete) return;
+
+      try {
+        await db.collection('messages').doc(messageToDelete).delete();
+        closeModal('deleteModal');
+        loadStats(); // Recharger les statistiques
+        showNotification('Message supprimé avec succès', 'success');
+      } catch (error) {
+        console.error("Erreur lors de la suppression:", error);
+        showNotification('Erreur lors de la suppression', 'error');
+      }
+    }
+
+    // Supprimer tous les messages
+    async function clearAllMessages() {
+      if (!confirm('Êtes-vous sûr de vouloir supprimer TOUS les messages ? Cette action est irréversible.')) {
+        return;
+      }
+
+      try {
+        const snapshot = await db.collection('messages').get();
+        const batch = db.batch();
+        
+        snapshot.forEach(doc => {
+          batch.delete(doc.ref);
+        });
+        
+        await batch.commit();
+        loadStats();
+        showNotification('Tous les messages ont été supprimés', 'success');
+      } catch (error) {
+        console.error("Erreur lors de la suppression:", error);
+        showNotification('Erreur lors de la suppression', 'error');
+      }
+    }
+
+    // Exporter les messages
+    function exportMessages() {
+      const dataStr = JSON.stringify(allMessages, null, 2);
+      const dataBlob = new Blob([dataStr], {type: 'application/json'});
+      
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(dataBlob);
+      link.download = `messages-livre-dor-${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      
+      showNotification('Messages exportés avec succès', 'success');
+    }
+
+    // Afficher la modale des paramètres
+    function showSettingsModal() {
+      // Charger les paramètres actuels
+      const settings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
+      document.getElementById('messageLimit').value = settings.messageLimit || 2;
+      document.getElementById('siteTitle').value = settings.siteTitle || '';
+      document.getElementById('siteDescription').value = settings.siteDescription || '';
+      
+      document.getElementById('settingsModal').classList.add('open');
+    }
+
+    // Sauvegarder les paramètres
+    document.getElementById('settingsForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const settings = {
+        messageLimit: parseInt(document.getElementById('messageLimit').value),
+        siteTitle: document.getElementById('siteTitle').value,
+        siteDescription: document.getElementById('siteDescription').value
+      };
+      
+      localStorage.setItem('siteSettings', JSON.stringify(settings));
+      closeModal('settingsModal');
+      showNotification('Paramètres sauvegardés', 'success');
+    });
+
+    // Fermer une modale
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('open');
+    }
+
+    // Afficher une notification
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.className = `fixed top-4 right-4 p-4 rounded-lg text-white z-50 ${
+        type === 'success' ? 'bg-green-500' : 
+        type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+      }`;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.remove();
+      }, 3000);
+    }
+
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAuth();
+      loadStats();
+      
+      // Événements de recherche en temps réel
+      document.getElementById('searchAdmin').addEventListener('input', filterMessages);
+      document.getElementById('sortAdmin').addEventListener('change', filterMessages);
+    });
+  </script>
+</body>
+</html>
