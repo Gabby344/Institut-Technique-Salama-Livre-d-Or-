@@ -13,6 +13,9 @@
   <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore-compat.js"></script>
 
+  <!-- GSAP pour animations avancées -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
   <style>
     :root {
       --primary-blue: #1E3A8A;
@@ -29,86 +32,135 @@
       min-height: 100vh;
     }
 
+    /* En-tête admin amélioré avec effets 3D */
     .admin-header {
       background: linear-gradient(135deg, var(--primary-blue), #0f1a3d);
       color: white;
-      padding: 2rem 0;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      padding: 2.5rem 0;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+      position: relative;
+      overflow: hidden;
     }
 
+    .admin-header::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(90deg, var(--accent-green), var(--secondary-gold));
+    }
+
+    .admin-header::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(217, 119, 6, 0.1) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    /* Cartes de statistiques améliorées */
     .stat-card {
       background: white;
-      border-radius: 15px;
-      padding: 1.5rem;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
       text-align: center;
-      border-top: 4px solid var(--secondary-gold);
+      border-top: 6px solid var(--secondary-gold);
+      transition: all 0.5s ease;
+      transform-style: preserve-3d;
+      perspective: 500px;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-10px) rotateX(5deg);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
     }
 
     .stat-number {
-      font-size: 2.5rem;
+      font-size: 3rem;
       font-weight: 800;
       color: var(--primary-blue);
       display: block;
+      transition: all 0.5s ease;
     }
 
+    .stat-card:hover .stat-number {
+      transform: scale(1.1) translateZ(20px);
+      color: var(--secondary-gold);
+    }
+
+    /* Cartes de messages améliorées */
     .message-card {
       background: white;
-      border-radius: 12px;
-      padding: 1.5rem;
-      margin-bottom: 1rem;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-      border-left: 4px solid var(--accent-green);
-      transition: all 0.3s ease;
+      border-radius: 15px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      border-left: 5px solid var(--accent-green);
+      transition: all 0.4s ease;
+      transform-style: preserve-3d;
     }
 
     .message-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+      transform: translateY(-5px) rotateY(3deg);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+      border-left-color: var(--secondary-gold);
     }
 
+    /* Boutons améliorés avec effets 3D */
     .btn-danger {
       background: linear-gradient(135deg, #dc2626, #b91c1c);
       color: white;
       border: none;
-      border-radius: 8px;
-      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      padding: 0.8rem 1.5rem;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.4s ease;
+      box-shadow: 0 5px 15px rgba(220, 38, 38, 0.3);
+      transform-style: preserve-3d;
     }
 
     .btn-danger:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(220, 38, 38, 0.4);
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 10px 20px rgba(220, 38, 38, 0.5);
     }
 
     .btn-primary {
       background: linear-gradient(135deg, var(--primary-blue), #3730a3);
       color: white;
       border: none;
-      border-radius: 8px;
-      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      padding: 0.8rem 1.5rem;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.4s ease;
+      box-shadow: 0 5px 15px rgba(30, 58, 138, 0.3);
+      transform-style: preserve-3d;
     }
 
     .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(30, 58, 138, 0.4);
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 10px 20px rgba(30, 58, 138, 0.5);
     }
 
+    /* Modales améliorées avec effets 3D */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.8);
+      background: rgba(0,0,0,0.85);
       display: flex;
       justify-content: center;
       align-items: center;
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.4s ease, visibility 0.4s ease;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
       z-index: 10000;
-      backdrop-filter: blur(5px);
+      backdrop-filter: blur(10px);
+      perspective: 1000px;
     }
 
     .modal-overlay.open {
@@ -118,28 +170,244 @@
     
     .modal-content {
       background: white;
-      padding: 2rem;
-      border-radius: 15px;
+      padding: 3rem;
+      border-radius: 20px;
       max-width: 500px;
       width: 90%;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-      transform: scale(0.9);
-      transition: transform 0.4s ease;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+      transform: rotateX(-15deg) translateY(50px) scale(0.9);
+      transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border-top: 6px solid var(--secondary-gold);
+      transform-style: preserve-3d;
     }
     
     .modal-overlay.open .modal-content {
-      transform: scale(1);
+      transform: rotateX(0) translateY(0) scale(1);
+    }
+
+    /* Champs de formulaire améliorés */
+    input, textarea, select {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: 'Merriweather', serif;
+      transition: all 0.4s ease;
+      background: #f8fafc;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05) inset;
+      transform-style: preserve-3d;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--secondary-gold);
+      box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.2), 0 5px 15px rgba(0,0,0,0.1) inset;
+      outline: none;
+      background: white;
+      transform: translateY(-3px) translateZ(10px);
+    }
+
+    /* Section de recherche améliorée */
+    .search-section {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+      transform-style: preserve-3d;
+      transition: all 0.4s ease;
+    }
+
+    .search-section:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+
+    /* Section des actions rapides */
+    .quick-actions {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+      transform-style: preserve-3d;
+      transition: all 0.4s ease;
+    }
+
+    .quick-actions:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+
+    /* Liste des messages avec défilement */
+    .messages-container {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      max-height: 600px;
+      overflow-y: auto;
+      transform-style: preserve-3d;
+      transition: all 0.4s ease;
+    }
+
+    .messages-container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+
+    /* Effet de particules flottantes */
+    .floating-particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
+    
+    .particle {
+      position: absolute;
+      background: rgba(217, 119, 6, 0.1);
+      border-radius: 50%;
+      animation: float 20s infinite linear;
+      filter: blur(1px);
+    }
+    
+    @keyframes float {
+      0% {
+        transform: translateY(0) rotate(0deg) scale(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+        transform: translateY(-10vh) rotate(90deg) scale(1);
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100vh) rotate(360deg) scale(0);
+        opacity: 0;
+      }
+    }
+
+    /* Effet de lumière qui suit la souris */
+    .light-spot {
+      position: fixed;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(217, 119, 6, 0.15) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: -1;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s ease;
+    }
+
+    /* Notification toast */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 1rem 2rem;
+      border-radius: 10px;
+      color: white;
+      font-weight: bold;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      transform: translateX(100%);
+      transition: transform 0.5s ease;
+      z-index: 10001;
+    }
+
+    .toast.show {
+      transform: translateX(0);
+    }
+
+    .toast.success {
+      background: linear-gradient(135deg, var(--accent-green), #10b981);
+    }
+
+    .toast.error {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+    }
+
+    .toast.info {
+      background: linear-gradient(135deg, var(--primary-blue), #3730a3);
+    }
+
+    /* Animation d'entrée pour les sections */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Effet de scintillement pour les titres */
+    .shimmer {
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      background-size: 200% 100%;
+      animation: shimmer 3s infinite;
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    /* Effet de vibration pour les boutons */
+    @keyframes vibrate {
+      0% { transform: translate(0); }
+      20% { transform: translate(-2px, 2px); }
+      40% { transform: translate(-2px, -2px); }
+      60% { transform: translate(2px, 2px); }
+      80% { transform: translate(2px, -2px); }
+      100% { transform: translate(0); }
+    }
+
+    .vibrate {
+      animation: vibrate 0.3s linear infinite;
+    }
+
+    /* Indicateur de chargement */
+    .loader {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
   </style>
 </head>
 
 <body>
+  <!-- Effet de lumière qui suit la souris -->
+  <div class="light-spot" id="lightSpot"></div>
+
+  <!-- Particules flottantes -->
+  <div class="floating-particles" id="particles"></div>
+
   <!-- En-tête admin -->
   <header class="admin-header">
     <div class="max-w-6xl mx-auto px-4">
       <div class="flex justify-between items-center">
         <div>
-          <h1 class="text-3xl md:text-4xl font-bold">🔧 Administration</h1>
+          <h1 class="text-3xl md:text-4xl font-bold shimmer">🔧 Administration</h1>
           <p class="text-lg opacity-90">Livre d'Or - 70 Ans ITS Salama</p>
         </div>
         <div class="flex space-x-4">
@@ -156,7 +424,7 @@
 
   <main class="max-w-6xl mx-auto px-4 py-8">
     <!-- Statistiques -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 fade-in">
       <div class="stat-card">
         <span class="stat-number" id="totalMessages">0</span>
         <span class="text-gray-600">Messages totaux</span>
@@ -176,14 +444,17 @@
     </div>
 
     <!-- Actions rapides -->
-    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
-      <h2 class="text-2xl font-bold mb-4" style="color: var(--primary-blue);">Actions Rapides</h2>
+    <div class="quick-actions fade-in">
+      <h2 class="text-2xl font-bold mb-4 shimmer" style="color: var(--primary-blue);">Actions Rapides</h2>
       <div class="flex flex-wrap gap-4">
         <button onclick="exportMessages()" class="btn-primary">
           📤 Exporter les messages
         </button>
         <button onclick="showSettingsModal()" class="btn-primary">
           ⚙️ Paramètres du site
+        </button>
+        <button onclick="showAnalyticsModal()" class="btn-primary">
+          📊 Analytics avancés
         </button>
         <button onclick="clearAllMessages()" class="btn-danger">
           🗑️ Tout supprimer
@@ -192,17 +463,18 @@
     </div>
 
     <!-- Recherche et filtres -->
-    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+    <div class="search-section fade-in">
       <div class="flex flex-col md:flex-row gap-4 items-center">
         <div class="flex-1">
           <input type="text" id="searchAdmin" placeholder="Rechercher un message ou un auteur..." 
-                 class="w-full p-3 border border-gray-300 rounded-lg">
+                 class="search-input">
         </div>
         <div class="flex gap-2">
           <select id="sortAdmin" class="p-3 border border-gray-300 rounded-lg">
             <option value="newest">Plus récents</option>
             <option value="oldest">Plus anciens</option>
             <option value="name">Nom (A-Z)</option>
+            <option value="length">Longueur</option>
           </select>
           <button onclick="filterMessages()" class="btn-primary">
             🔍 Filtrer
@@ -212,8 +484,8 @@
     </div>
 
     <!-- Liste des messages -->
-    <div class="bg-white rounded-2xl shadow-lg p-6">
-      <h2 class="text-2xl font-bold mb-4" style="color: var(--primary-blue);">
+    <div class="messages-container fade-in">
+      <h2 class="text-2xl font-bold mb-4 shimmer" style="color: var(--primary-blue);">
         Gestion des Messages (<span id="messageCount">0</span>)
       </h2>
       <div id="messagesList" class="max-h-96 overflow-y-auto">
@@ -238,7 +510,7 @@
   <!-- Modale de paramètres -->
   <div id="settingsModal" class="modal-overlay">
     <div class="modal-content">
-      <h3 class="text-xl font-bold mb-4" style="color: var(--primary-blue);">Paramètres du Site</h3>
+      <h3 class="text-xl font-bold mb-4 shimmer" style="color: var(--primary-blue);">Paramètres du Site</h3>
       <form id="settingsForm">
         <div class="mb-4">
           <label class="block font-bold mb-2">Limite de messages par personne:</label>
@@ -252,11 +524,62 @@
           <label class="block font-bold mb-2">Description:</label>
           <textarea id="siteDescription" class="w-full p-3 border border-gray-300 rounded-lg" rows="3"></textarea>
         </div>
+        <div class="mb-4">
+          <label class="block font-bold mb-2">Couleur principale:</label>
+          <input type="color" id="primaryColor" class="w-full p-1 border border-gray-300 rounded-lg" value="#1E3A8A">
+        </div>
+        <div class="mb-4">
+          <label class="block font-bold mb-2">Couleur secondaire:</label>
+          <input type="color" id="secondaryColor" class="w-full p-1 border border-gray-300 rounded-lg" value="#D97706">
+        </div>
         <div class="flex gap-4">
           <button type="submit" class="btn-primary flex-1">💾 Sauvegarder</button>
           <button type="button" onclick="closeModal('settingsModal')" class="btn-primary flex-1" style="background: #6b7280;">Annuler</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Modale d'analytics avancés -->
+  <div id="analyticsModal" class="modal-overlay">
+    <div class="modal-content">
+      <h3 class="text-xl font-bold mb-4 shimmer" style="color: var(--primary-blue);">Analytics Avancés</h3>
+      <div class="space-y-4">
+        <div class="flex justify-between">
+          <span>Heure de pointe:</span>
+          <span id="peakHour" class="font-bold">--:--</span>
+        </div>
+        <div class="flex justify-between">
+          <span>Jour le plus actif:</span>
+          <span id="mostActiveDay" class="font-bold">--</span>
+        </div>
+        <div class="flex justify-between">
+          <span>Message le plus long:</span>
+          <span id="longestMessage" class="font-bold">0 caractères</span>
+        </div>
+        <div class="flex justify-between">
+          <span>Auteur le plus actif:</span>
+          <span id="mostActiveAuthor" class="font-bold">--</span>
+        </div>
+      </div>
+      <button onclick="closeModal('analyticsModal')" class="btn-primary w-full mt-6">Fermer</button>
+    </div>
+  </div>
+
+  <!-- Modale de confirmation de suppression totale -->
+  <div id="clearAllModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="text-4xl mb-4 text-center">🚨</div>
+      <h3 class="text-xl font-bold mb-4 text-center">Supprimer TOUS les messages</h3>
+      <p class="mb-6 text-center">Êtes-vous ABSOLUMENT sûr de vouloir supprimer TOUS les messages ? Cette action est irréversible et supprimera <span id="deleteCount" class="font-bold">0</span> messages.</p>
+      <div class="mb-4">
+        <label class="block font-bold mb-2">Tapez "SUPPRIMER" pour confirmer:</label>
+        <input type="text" id="confirmDeleteInput" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="SUPPRIMER">
+      </div>
+      <div class="flex gap-4">
+        <button onclick="confirmClearAll()" class="btn-danger flex-1" id="confirmClearBtn" disabled>🗑️ TOUT SUPPRIMER</button>
+        <button onclick="closeModal('clearAllModal')" class="btn-primary flex-1">Annuler</button>
+      </div>
     </div>
   </div>
 
@@ -279,6 +602,80 @@
     let allMessages = [];
     let filteredMessages = [];
     let messageToDelete = null;
+    let analyticsData = {};
+
+    // Générer des particules flottantes
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 30;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+        
+        const size = Math.random() * 20 + 5;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        
+        particle.style.left = `${Math.random() * 100}%`;
+        particle.style.top = `${Math.random() * 100}%`;
+        
+        particle.style.animationDelay = `${Math.random() * 15}s`;
+        
+        const colors = [
+          'rgba(30, 58, 138, 0.1)',
+          'rgba(217, 119, 6, 0.1)',
+          'rgba(5, 150, 105, 0.1)'
+        ];
+        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+        
+        particlesContainer.appendChild(particle);
+      }
+    }
+
+    // Effet de lumière qui suit la souris
+    function initLightSpot() {
+      const lightSpot = document.getElementById('lightSpot');
+      document.addEventListener('mousemove', (e) => {
+        lightSpot.style.left = `${e.clientX}px`;
+        lightSpot.style.top = `${e.clientY}px`;
+      });
+    }
+
+    // Animation d'entrée des sections
+    function initScrollAnimations() {
+      const fadeElements = document.querySelectorAll('.fade-in');
+      
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.1 });
+      
+      fadeElements.forEach(el => observer.observe(el));
+    }
+
+    // Afficher une notification
+    function showNotification(message, type = 'info') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.classList.add('show');
+      }, 100);
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+          document.body.removeChild(toast);
+        }, 500);
+      }, 3000);
+    }
 
     // Vérifier l'authentification
     function checkAuth() {
@@ -290,7 +687,10 @@
     // Déconnexion
     function logout() {
       localStorage.removeItem('adminAuthenticated');
-      window.location.href = 'index.html';
+      showNotification('Déconnexion réussie', 'success');
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1000);
     }
 
     // Charger les statistiques
@@ -332,11 +732,63 @@
         const avgLength = messages.length > 0 ? Math.round(totalChars / messages.length) : 0;
         document.getElementById('avgMessageLength').textContent = avgLength;
 
+        // Calculer les analytics
+        calculateAnalytics(messages);
+
         displayMessages();
 
       } catch (error) {
         console.error("Erreur lors du chargement:", error);
+        showNotification('Erreur lors du chargement des messages', 'error');
       }
+    }
+
+    // Calculer les analytics avancés
+    function calculateAnalytics(messages) {
+      if (messages.length === 0) return;
+      
+      // Heure de pointe
+      const hourCounts = {};
+      messages.forEach(msg => {
+        const hour = msg.timestamp.toDate().getHours();
+        hourCounts[hour] = (hourCounts[hour] || 0) + 1;
+      });
+      
+      let peakHour = Object.keys(hourCounts).reduce((a, b) => 
+        hourCounts[a] > hourCounts[b] ? a : b
+      );
+      analyticsData.peakHour = `${peakHour}:00`;
+      
+      // Jour le plus actif
+      const dayCounts = {};
+      const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+      messages.forEach(msg => {
+        const day = msg.timestamp.toDate().getDay();
+        dayCounts[day] = (dayCounts[day] || 0) + 1;
+      });
+      
+      let mostActiveDay = Object.keys(dayCounts).reduce((a, b) => 
+        dayCounts[a] > dayCounts[b] ? a : b
+      );
+      analyticsData.mostActiveDay = days[mostActiveDay];
+      
+      // Message le plus long
+      const longestMessage = messages.reduce((longest, msg) => 
+        msg.message.length > longest.message.length ? msg : longest
+      );
+      analyticsData.longestMessage = longestMessage.message.length;
+      
+      // Auteur le plus actif
+      const authorCounts = {};
+      messages.forEach(msg => {
+        const author = msg.name || 'Anonyme';
+        authorCounts[author] = (authorCounts[author] || 0) + 1;
+      });
+      
+      let mostActiveAuthor = Object.keys(authorCounts).reduce((a, b) => 
+        authorCounts[a] > authorCounts[b] ? a : b
+      );
+      analyticsData.mostActiveAuthor = mostActiveAuthor;
     }
 
     // Afficher les messages
@@ -369,6 +821,9 @@
                   minute: '2-digit'
                 }) || 'Date inconnue'}
               </p>
+              <p class="text-sm text-gray-500 mt-1">
+                ${message.message.length} caractères
+              </p>
             </div>
             <button onclick="openDeleteModal('${message.id}')" class="btn-danger ml-4">
               🗑️ Supprimer
@@ -400,6 +855,9 @@
         case 'name':
           filteredMessages.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
           break;
+        case 'length':
+          filteredMessages.sort((a, b) => b.message.length - a.message.length);
+          break;
       }
 
       document.getElementById('messageCount').textContent = filteredMessages.length;
@@ -428,11 +886,15 @@
     }
 
     // Supprimer tous les messages
-    async function clearAllMessages() {
-      if (!confirm('Êtes-vous sûr de vouloir supprimer TOUS les messages ? Cette action est irréversible.')) {
-        return;
-      }
+    function clearAllMessages() {
+      document.getElementById('deleteCount').textContent = allMessages.length;
+      document.getElementById('confirmDeleteInput').value = '';
+      document.getElementById('confirmClearBtn').disabled = true;
+      document.getElementById('clearAllModal').classList.add('open');
+    }
 
+    // Confirmer la suppression de tous les messages
+    async function confirmClearAll() {
       try {
         const snapshot = await db.collection('messages').get();
         const batch = db.batch();
@@ -442,6 +904,7 @@
         });
         
         await batch.commit();
+        closeModal('clearAllModal');
         loadStats();
         showNotification('Tous les messages ont été supprimés', 'success');
       } catch (error) {
@@ -470,8 +933,20 @@
       document.getElementById('messageLimit').value = settings.messageLimit || 2;
       document.getElementById('siteTitle').value = settings.siteTitle || '';
       document.getElementById('siteDescription').value = settings.siteDescription || '';
+      document.getElementById('primaryColor').value = settings.primaryColor || '#1E3A8A';
+      document.getElementById('secondaryColor').value = settings.secondaryColor || '#D97706';
       
       document.getElementById('settingsModal').classList.add('open');
+    }
+
+    // Afficher la modale des analytics
+    function showAnalyticsModal() {
+      document.getElementById('peakHour').textContent = analyticsData.peakHour || '--:--';
+      document.getElementById('mostActiveDay').textContent = analyticsData.mostActiveDay || '--';
+      document.getElementById('longestMessage').textContent = analyticsData.longestMessage ? `${analyticsData.longestMessage} caractères` : '0 caractères';
+      document.getElementById('mostActiveAuthor').textContent = analyticsData.mostActiveAuthor || '--';
+      
+      document.getElementById('analyticsModal').classList.add('open');
     }
 
     // Sauvegarder les paramètres
@@ -481,7 +956,9 @@
       const settings = {
         messageLimit: parseInt(document.getElementById('messageLimit').value),
         siteTitle: document.getElementById('siteTitle').value,
-        siteDescription: document.getElementById('siteDescription').value
+        siteDescription: document.getElementById('siteDescription').value,
+        primaryColor: document.getElementById('primaryColor').value,
+        secondaryColor: document.getElementById('secondaryColor').value
       };
       
       localStorage.setItem('siteSettings', JSON.stringify(settings));
@@ -494,30 +971,35 @@
       document.getElementById(modalId).classList.remove('open');
     }
 
-    // Afficher une notification
-    function showNotification(message, type = 'info') {
-      const notification = document.createElement('div');
-      notification.className = `fixed top-4 right-4 p-4 rounded-lg text-white z-50 ${
-        type === 'success' ? 'bg-green-500' : 
-        type === 'error' ? 'bg-red-500' : 'bg-blue-500'
-      }`;
-      notification.textContent = message;
-      
-      document.body.appendChild(notification);
-      
-      setTimeout(() => {
-        notification.remove();
-      }, 3000);
-    }
-
     // Initialisation
     document.addEventListener('DOMContentLoaded', () => {
       checkAuth();
       loadStats();
+      createParticles();
+      initLightSpot();
+      initScrollAnimations();
       
       // Événements de recherche en temps réel
       document.getElementById('searchAdmin').addEventListener('input', filterMessages);
       document.getElementById('sortAdmin').addEventListener('change', filterMessages);
+      
+      // Confirmation de suppression totale
+      document.getElementById('confirmDeleteInput').addEventListener('input', (e) => {
+        document.getElementById('confirmClearBtn').disabled = 
+          e.target.value !== 'SUPPRIMER';
+      });
+      
+      // Initialiser GSAP pour des animations avancées
+      if (typeof gsap !== 'undefined') {
+        // Animation des cartes de statistiques
+        gsap.from('.stat-card', {
+          duration: 1,
+          y: 50,
+          opacity: 0,
+          stagger: 0.2,
+          ease: 'power3.out'
+        });
+      }
     });
   </script>
 </body>
