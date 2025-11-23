@@ -13,6 +13,10 @@
   <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore-compat.js"></script>
 
+  <!-- GSAP pour animations avancées -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
   <style>
     :root {
       --primary-blue: #1E3A8A;
@@ -31,7 +35,7 @@
       min-height: 100vh;
     }
 
-    /* Bannière défilante */
+    /* Bannière défilante améliorée */
     .marquee-banner {
       background: linear-gradient(90deg, 
         var(--primary-blue), 
@@ -63,7 +67,7 @@
     .marquee-content {
       display: inline-block;
       padding-left: 100%;
-      animation: defilement-rtl 20s infinite linear;
+      animation: defilement-rtl 25s infinite linear;
     }
 
     @keyframes defilement-rtl {
@@ -71,7 +75,7 @@
       100% { transform: translate3d(-100%,0,0); }
     }
 
-    /* En-tête avec autocollant */
+    /* En-tête avec autocollant amélioré */
     .sticker-anniversaire {
       position: relative;
       display: inline-block;
@@ -80,21 +84,33 @@
       padding: 1.8rem 2.5rem;
       border-radius: 50% 50% 50% 0;
       transform: rotate(-5deg);
-      box-shadow: 0 15px 30px rgba(217, 119, 6, 0.5), 
-                  0 0 0 1px rgba(255,255,255,0.2) inset,
-                  0 0 20px rgba(255,215,0,0.4) inset;
+      box-shadow: 0 20px 40px rgba(217, 119, 6, 0.6), 
+                  0 0 0 1px rgba(255,255,255,0.3) inset,
+                  0 0 30px rgba(255,215,0,0.6) inset;
       margin: 2rem auto;
       font-family: 'Playfair Display', serif;
-      font-size: 2rem;
+      font-size: 2.2rem;
       text-align: center;
       z-index: 10;
-      animation: sticker-pulse 3s infinite alternate;
+      animation: sticker-pulse 3s infinite alternate, sticker-float 6s infinite ease-in-out;
       text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: all 0.3s ease;
     }
 
     @keyframes sticker-pulse {
-      0% { transform: rotate(-5deg) scale(1); }
-      100% { transform: rotate(-5deg) scale(1.05); }
+      0% { transform: rotate(-5deg) scale(1); box-shadow: 0 15px 30px rgba(217, 119, 6, 0.5); }
+      100% { transform: rotate(-5deg) scale(1.08); box-shadow: 0 25px 50px rgba(217, 119, 6, 0.8); }
+    }
+    
+    @keyframes sticker-float {
+      0%, 100% { transform: rotate(-5deg) translateY(0); }
+      50% { transform: rotate(-5deg) translateY(-10px); }
+    }
+
+    .sticker-anniversaire:hover {
+      animation: sticker-pulse 1s infinite alternate, sticker-float 3s infinite ease-in-out;
+      transform: rotate(-5deg) scale(1.1);
     }
 
     .sticker-anniversaire::after {
@@ -107,211 +123,27 @@
       background: radial-gradient(circle at top left, transparent 70%, rgba(0,0,0,0.15) 70%);
     }
 
-    /* Boutons */
+    /* Boutons améliorés avec effet 3D */
     .btn-primary {
       background: linear-gradient(135deg, var(--primary-blue), #3730a3);
       color: white;
       font-weight: 700;
       border: none;
       border-radius: 50px;
-      padding: 1rem 2rem;
-      font-size: 1.1rem;
+      padding: 1.2rem 2.5rem;
+      font-size: 1.2rem;
       cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 6px 20px rgba(30, 58, 138, 0.4);
+      transition: all 0.5s ease;
+      box-shadow: 0 10px 25px rgba(30, 58, 138, 0.5);
       text-decoration: none;
       display: inline-block;
       position: relative;
       overflow: hidden;
+      transform-style: preserve-3d;
+      perspective: 500px;
     }
 
     .btn-primary::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-      transition: left 0.7s;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 25px rgba(30, 58, 138, 0.6);
-    }
-
-    .btn-primary:hover::before {
-      left: 100%;
-    }
-
-    /* Filtres améliorés */
-    .filter-btn {
-      padding: 0.7rem 1.5rem;
-      font-size: 1rem;
-      font-weight: 600;
-      border-radius: 9999px;
-      border: 2px solid var(--primary-blue);
-      color: var(--primary-blue);
-      background-color: transparent;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      margin: 0.5rem;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    }
-
-    .filter-btn.active {
-      background: linear-gradient(135deg, var(--primary-blue), #3730a3);
-      color: white;
-      box-shadow: 0 6px 15px rgba(30, 58, 138, 0.4);
-      transform: translateY(-2px);
-    }
-
-    .filter-btn:hover:not(.active) {
-      background-color: rgba(30, 58, 138, 0.1);
-      transform: translateY(-2px);
-    }
-
-    /* Cartes de témoignage améliorées */
-    .testimonial-card {
-      background: linear-gradient(135deg, #ffffff, #f8fafc);
-      border-radius: 20px;
-      padding: 2.5rem;
-      margin-bottom: 2.5rem;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-      border-left: 8px solid var(--secondary-gold);
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .testimonial-card::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 4px;
-      background: linear-gradient(90deg, var(--primary-blue), var(--accent-green), var(--secondary-gold));
-    }
-
-    .testimonial-card:hover {
-      transform: translateY(-10px) scale(1.02);
-      box-shadow: 0 25px 50px rgba(0,0,0,0.15);
-    }
-
-    .testimonial-card::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 80px;
-      height: 80px;
-      background: linear-gradient(135deg, rgba(217, 119, 6, 0.1), transparent);
-      border-radius: 0 0 0 80px;
-    }
-
-    .testimonial-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: var(--primary-blue);
-      margin-bottom: 1.5rem;
-      padding-bottom: 1rem;
-      border-bottom: 3px dashed var(--secondary-gold);
-      display: flex;
-      align-items: center;
-    }
-
-    .testimonial-name::before {
-      content: "✍️";
-      margin-right: 0.8rem;
-      font-size: 1.8rem;
-    }
-
-    .testimonial-message {
-      font-size: 1.2rem;
-      line-height: 1.8;
-      color: #444;
-      font-style: italic;
-      margin-bottom: 2rem;
-      position: relative;
-      padding-left: 2rem;
-      background: rgba(248, 250, 252, 0.7);
-      padding: 1.5rem;
-      border-radius: 12px;
-      border-left: 4px solid var(--accent-green);
-    }
-
-    .testimonial-message::before {
-      content: "“";
-      position: absolute;
-      left: 0.5rem;
-      top: -0.5rem;
-      font-size: 4rem;
-      color: var(--secondary-gold);
-      font-family: 'Playfair Display', serif;
-      line-height: 1;
-    }
-
-    .testimonial-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 2rem;
-      padding-top: 1.5rem;
-      border-top: 2px solid #e2e8f0;
-    }
-
-    .testimonial-signature {
-      font-family: 'Sacramento', cursive;
-      font-size: 2.5rem;
-      color: var(--primary-blue);
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
-    }
-
-    .testimonial-date {
-      font-size: 1rem;
-      color: #777;
-      background: rgba(248, 250, 252, 0.8);
-      padding: 0.5rem 1rem;
-      border-radius: 20px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    }
-
-    /* Animation d'apparition améliorée */
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px) scale(0.95);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-    }
-
-    .animate-card {
-      animation: fadeInUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-      opacity: 0;
-    }
-
-    /* Compteur de messages amélioré */
-    .counter-badge {
-      background: linear-gradient(135deg, var(--secondary-gold), #f59e0b);
-      color: white;
-      border-radius: 50px;
-      padding: 0.8rem 2rem;
-      font-weight: 800;
-      display: inline-block;
-      margin: 1.5rem 0;
-      box-shadow: 0 8px 20px rgba(217, 119, 6, 0.4);
-      font-size: 1.2rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .counter-badge::before {
       content: "";
       position: absolute;
       top: 0;
@@ -322,6 +154,230 @@
       transition: left 0.7s;
     }
 
+    .btn-primary:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 15px 30px rgba(30, 58, 138, 0.7);
+    }
+
+    .btn-primary:hover::before {
+      left: 100%;
+    }
+
+    /* Filtres améliorés avec effets 3D */
+    .filter-btn {
+      padding: 0.8rem 1.8rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 9999px;
+      border: 2px solid var(--primary-blue);
+      color: var(--primary-blue);
+      background-color: transparent;
+      transition: all 0.4s ease;
+      cursor: pointer;
+      margin: 0.5rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      transform-style: preserve-3d;
+    }
+
+    .filter-btn.active {
+      background: linear-gradient(135deg, var(--primary-blue), #3730a3);
+      color: white;
+      box-shadow: 0 8px 20px rgba(30, 58, 138, 0.4);
+      transform: translateY(-3px) scale(1.05);
+    }
+
+    .filter-btn:hover:not(.active) {
+      background-color: rgba(30, 58, 138, 0.1);
+      transform: translateY(-3px);
+    }
+
+    /* Cartes de témoignage améliorées avec effets 3D */
+    .testimonial-card {
+      background: linear-gradient(135deg, #ffffff, #f8fafc);
+      border-radius: 25px;
+      padding: 3rem;
+      margin-bottom: 3rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      border-left: 10px solid var(--secondary-gold);
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+    }
+
+    .testimonial-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(90deg, var(--primary-blue), var(--accent-green), var(--secondary-gold));
+    }
+
+    .testimonial-card:hover {
+      transform: translateY(-15px) rotateY(5deg) scale(1.02);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+    }
+
+    .testimonial-card::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(135deg, rgba(217, 119, 6, 0.1), transparent);
+      border-radius: 0 0 0 100px;
+    }
+
+    .testimonial-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary-blue);
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 3px dashed var(--secondary-gold);
+      display: flex;
+      align-items: center;
+      transition: all 0.5s ease;
+    }
+
+    .testimonial-card:hover .testimonial-name {
+      transform: translateZ(20px);
+      color: var(--secondary-gold);
+    }
+
+    .testimonial-name::before {
+      content: "✍️";
+      margin-right: 1rem;
+      font-size: 2rem;
+    }
+
+    .testimonial-message {
+      font-size: 1.3rem;
+      line-height: 1.8;
+      color: #444;
+      font-style: italic;
+      margin-bottom: 2.5rem;
+      position: relative;
+      padding-left: 2.5rem;
+      background: rgba(248, 250, 252, 0.7);
+      padding: 2rem;
+      border-radius: 15px;
+      border-left: 5px solid var(--accent-green);
+      transition: all 0.5s ease;
+    }
+
+    .testimonial-card:hover .testimonial-message {
+      transform: translateZ(10px);
+      background: rgba(248, 250, 252, 0.9);
+    }
+
+    .testimonial-message::before {
+      content: "“";
+      position: absolute;
+      left: 0.8rem;
+      top: -0.8rem;
+      font-size: 5rem;
+      color: var(--secondary-gold);
+      font-family: 'Playfair Display', serif;
+      line-height: 1;
+    }
+
+    .testimonial-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2.5rem;
+      padding-top: 2rem;
+      border-top: 2px solid #e2e8f0;
+      transition: all 0.5s ease;
+    }
+
+    .testimonial-card:hover .testimonial-footer {
+      transform: translateZ(15px);
+    }
+
+    .testimonial-signature {
+      font-family: 'Sacramento', cursive;
+      font-size: 3rem;
+      color: var(--primary-blue);
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+      transition: all 0.5s ease;
+    }
+
+    .testimonial-card:hover .testimonial-signature {
+      color: var(--secondary-gold);
+      transform: scale(1.1);
+    }
+
+    .testimonial-date {
+      font-size: 1.1rem;
+      color: #777;
+      background: rgba(248, 250, 252, 0.8);
+      padding: 0.8rem 1.5rem;
+      border-radius: 25px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+      transition: all 0.5s ease;
+    }
+
+    .testimonial-card:hover .testimonial-date {
+      transform: translateZ(10px);
+      background: rgba(248, 250, 252, 0.9);
+    }
+
+    /* Animation d'apparition améliorée */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95) rotateX(10deg);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1) rotateX(0);
+      }
+    }
+
+    .animate-card {
+      animation: fadeInUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      opacity: 0;
+    }
+
+    /* Compteur de messages amélioré */
+    .counter-badge {
+      background: linear-gradient(135deg, var(--secondary-gold), #f59e0b);
+      color: white;
+      border-radius: 50px;
+      padding: 1rem 2.5rem;
+      font-weight: 800;
+      display: inline-block;
+      margin: 2rem 0;
+      box-shadow: 0 10px 25px rgba(217, 119, 6, 0.5);
+      font-size: 1.3rem;
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      transition: all 0.5s ease;
+    }
+
+    .counter-badge::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      transition: left 0.7s;
+    }
+
+    .counter-badge:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 15px 30px rgba(217, 119, 6, 0.7);
+    }
+
     .counter-badge:hover::before {
       left: 100%;
     }
@@ -329,53 +385,75 @@
     /* Section vide améliorée */
     .empty-state {
       text-align: center;
-      padding: 5rem 1rem;
+      padding: 6rem 2rem;
       color: #64748b;
       background: white;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-      margin: 2rem 0;
+      border-radius: 25px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+      margin: 3rem 0;
+      transform-style: preserve-3d;
+      transition: all 0.5s ease;
+    }
+
+    .empty-state:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.15);
     }
 
     .empty-state-icon {
-      font-size: 5rem;
-      margin-bottom: 2rem;
+      font-size: 6rem;
+      margin-bottom: 3rem;
       opacity: 0.7;
+      transition: all 0.5s ease;
     }
 
-    /* Barre de recherche */
+    .empty-state:hover .empty-state-icon {
+      transform: scale(1.2) translateZ(20px);
+      opacity: 1;
+    }
+
+    /* Barre de recherche améliorée */
     .search-container {
-      max-width: 600px;
-      margin: 2rem auto;
+      max-width: 700px;
+      margin: 3rem auto;
       position: relative;
+      transform-style: preserve-3d;
     }
 
     .search-input {
       width: 100%;
-      padding: 1.2rem 1.5rem;
+      padding: 1.5rem 2rem;
       border: 2px solid #e2e8f0;
       border-radius: 50px;
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       font-family: 'Merriweather', serif;
-      transition: all 0.3s ease;
+      transition: all 0.4s ease;
       background: white;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-      padding-left: 3rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      padding-left: 4rem;
+      transform-style: preserve-3d;
     }
 
     .search-input:focus {
       border-color: var(--secondary-gold);
-      box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2), 0 8px 20px rgba(0,0,0,0.1);
+      box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.3), 0 10px 25px rgba(0,0,0,0.1);
       outline: none;
+      transform: translateY(-3px);
     }
 
     .search-icon {
       position: absolute;
-      left: 1.2rem;
+      left: 1.5rem;
       top: 50%;
       transform: translateY(-50%);
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       color: #94a3b8;
+      transition: all 0.3s ease;
+    }
+
+    .search-input:focus + .search-icon {
+      color: var(--secondary-gold);
+      transform: translateY(-50%) scale(1.2);
     }
 
     /* Pagination améliorée */
@@ -383,27 +461,29 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      margin: 3rem 0;
+      margin: 4rem 0;
+      transform-style: preserve-3d;
     }
 
     .pagination-btn {
-      padding: 0.8rem 1.5rem;
-      margin: 0 0.5rem;
+      padding: 1rem 2rem;
+      margin: 0 0.8rem;
       border: 2px solid var(--primary-blue);
       background: white;
       color: var(--primary-blue);
-      border-radius: 10px;
+      border-radius: 15px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      transition: all 0.4s ease;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      transform-style: preserve-3d;
     }
 
     .pagination-btn:hover:not(:disabled) {
       background: var(--primary-blue);
       color: white;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 15px rgba(30, 58, 138, 0.3);
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 10px 20px rgba(30, 58, 138, 0.4);
     }
 
     .pagination-btn:disabled {
@@ -413,88 +493,112 @@
     }
 
     .pagination-info {
-      margin: 0 1.5rem;
+      margin: 0 2rem;
       font-weight: 600;
       color: var(--primary-blue);
       background: rgba(248, 250, 252, 0.8);
-      padding: 0.5rem 1rem;
-      border-radius: 10px;
+      padding: 0.8rem 1.5rem;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      transition: all 0.4s ease;
     }
 
-    /* Section de statistiques */
+    .pagination:hover .pagination-info {
+      transform: translateZ(10px);
+    }
+
+    /* Section de statistiques améliorée */
     .stats-container {
       display: flex;
       justify-content: space-around;
       flex-wrap: wrap;
-      margin: 3rem 0;
+      margin: 4rem 0;
+      perspective: 1000px;
     }
     
     .stat-item {
       text-align: center;
-      padding: 2rem;
+      padding: 3rem 2.5rem;
       background: white;
-      border-radius: 15px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      margin: 1rem;
+      border-radius: 20px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+      margin: 1.5rem;
       flex: 1;
-      min-width: 200px;
-      border-top: 5px solid var(--secondary-gold);
-      transition: all 0.3s ease;
+      min-width: 220px;
+      border-top: 6px solid var(--secondary-gold);
+      transition: all 0.5s ease;
+      transform-style: preserve-3d;
     }
 
     .stat-item:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+      transform: translateY(-15px) rotateY(5deg);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.2);
     }
     
     .stat-number {
-      font-size: 2.8rem;
+      font-size: 3.5rem;
       font-weight: 800;
       color: var(--primary-blue);
       display: block;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+      transition: all 0.5s ease;
+    }
+
+    .stat-item:hover .stat-number {
+      transform: scale(1.1) translateZ(20px);
+      color: var(--secondary-gold);
     }
     
     .stat-label {
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       color: #64748b;
-      margin-top: 0.5rem;
+      margin-top: 1rem;
+      transition: all 0.5s ease;
     }
 
-    /* Bouton admin discret */
+    .stat-item:hover .stat-label {
+      transform: translateZ(10px);
+      color: var(--primary-blue);
+    }
+
+    /* Bouton admin discret amélioré */
     .admin-btn {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
+      bottom: 30px;
+      right: 30px;
       background: rgba(30, 58, 138, 0.9);
       color: white;
       border: none;
       border-radius: 50px;
-      padding: 0.8rem 1.5rem;
-      font-size: 0.9rem;
+      padding: 1.2rem 2.5rem;
+      font-size: 1.1rem;
       cursor: pointer;
       z-index: 1000;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-      transition: all 0.3s ease;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      transition: all 0.4s ease;
+      transform-style: preserve-3d;
+      perspective: 500px;
     }
 
     .admin-btn:hover {
       background: var(--primary-blue);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+      transform: translateY(-5px) rotateY(10deg);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.5);
     }
 
-    /* Impression */
-    @media print {
-      .no-print {
-        display: none !important;
-      }
-      
-      .testimonial-card {
-        break-inside: avoid;
-        box-shadow: none;
-        border: 1px solid #e2e8f0;
-        transform: none !important;
-      }
+    /* Effet de scintillement pour les titres */
+    .shimmer {
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      background-size: 200% 100%;
+      animation: shimmer 3s infinite;
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
     }
 
     /* Effet de particules flottantes */
@@ -512,12 +616,56 @@
       position: absolute;
       background: rgba(217, 119, 6, 0.1);
       border-radius: 50%;
-      animation: float 15s infinite linear;
+      animation: float 20s infinite linear;
+      filter: blur(1px);
     }
     
     @keyframes float {
       0% {
-        transform: translateY(0) rotate(0deg);
+        transform: translateY(0) rotate(0deg) scale(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+        transform: translateY(-10vh) rotate(90deg) scale(1);
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100vh) rotate(360deg) scale(0);
+        opacity: 0;
+      }
+    }
+
+    /* Effet de lumière qui suit la souris */
+    .light-spot {
+      position: fixed;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(217, 119, 6, 0.15) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: -1;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s ease;
+    }
+
+    /* Textes flottants magiques */
+    .floating-text {
+      position: absolute;
+      font-family: 'Sacramento', cursive;
+      font-size: 2rem;
+      color: rgba(217, 119, 6, 0.7);
+      pointer-events: none;
+      z-index: -1;
+      animation: float-text 15s infinite linear;
+      text-shadow: 0 0 10px rgba(217, 119, 6, 0.5);
+    }
+
+    @keyframes float-text {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
         opacity: 0;
       }
       10% {
@@ -527,9 +675,65 @@
         opacity: 1;
       }
       100% {
-        transform: translateY(-100vh) rotate(360deg);
+        transform: translateY(-100px) rotate(360deg);
         opacity: 0;
       }
+    }
+
+    /* Animations d'entrée pour les sections */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Impression */
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      
+      .testimonial-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #e2e8f0;
+        transform: none !important;
+      }
+      
+      .sticker-anniversaire {
+        transform: none !important;
+        animation: none !important;
+      }
+    }
+
+    /* Effet de vibration pour les boutons */
+    @keyframes vibrate {
+      0% { transform: translate(0); }
+      20% { transform: translate(-2px, 2px); }
+      40% { transform: translate(-2px, -2px); }
+      60% { transform: translate(2px, 2px); }
+      80% { transform: translate(2px, -2px); }
+      100% { transform: translate(0); }
+    }
+
+    .vibrate {
+      animation: vibrate 0.3s linear infinite;
+    }
+
+    /* Effet de pulse pour les nouveaux messages */
+    @keyframes pulse-glow {
+      0% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.7); }
+      70% { box-shadow: 0 0 0 15px rgba(217, 119, 6, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0); }
+    }
+
+    .pulse-glow {
+      animation: pulse-glow 2s infinite;
     }
   </style>
 </head>
@@ -538,8 +742,14 @@
   <!-- Bouton admin -->
   <button class="admin-btn" onclick="openAdminLogin()">🔧 Admin</button>
 
+  <!-- Effet de lumière qui suit la souris -->
+  <div class="light-spot" id="lightSpot"></div>
+
   <!-- Particules flottantes -->
   <div class="floating-particles" id="particles"></div>
+
+  <!-- Textes flottants magiques -->
+  <div id="floatingTexts"></div>
 
   <!-- Bannière défilante -->
   <div class="marquee-banner">
@@ -553,13 +763,13 @@
 
   <main class="max-w-6xl mx-auto px-4 py-8">
     <!-- En-tête -->
-    <div class="text-center">
-      <div class="sticker-anniversaire">
+    <div class="text-center fade-in">
+      <div class="sticker-anniversaire" onclick="createFireworks()">
         <div>70 Ans</div>
         <div style="font-size: 1.4rem;">ITS Salama</div>
       </div>
       
-      <h1 class="text-5xl md:text-6xl font-bold mt-6 mb-6" style="color: var(--primary-blue); font-family: 'Playfair Display', serif;">
+      <h1 class="text-5xl md:text-6xl font-bold mt-6 mb-6 shimmer" style="color: var(--primary-blue); font-family: 'Playfair Display', serif;">
         Livre d'Or du 70<sup>ème</sup> Anniversaire
       </h1>
       <p class="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
@@ -573,7 +783,7 @@
     </div>
 
     <!-- Section statistiques -->
-    <div class="stats-container">
+    <div class="stats-container fade-in">
       <div class="stat-item">
         <span class="stat-number" id="totalMessages">0</span>
         <span class="stat-label">Messages d'hommage</span>
@@ -586,16 +796,20 @@
         <span class="stat-number">1955</span>
         <span class="stat-label">Année de fondation</span>
       </div>
+      <div class="stat-item">
+        <span class="stat-number" id="todayMessages">0</span>
+        <span class="stat-label">Messages aujourd'hui</span>
+      </div>
     </div>
 
     <!-- Barre de recherche -->
-    <div class="search-container no-print">
+    <div class="search-container no-print fade-in">
       <div class="search-icon">🔍</div>
       <input type="text" id="searchInput" class="search-input" placeholder="Rechercher un message ou un auteur...">
     </div>
 
     <!-- Filtres et actions -->
-    <div class="no-print flex flex-col md:flex-row justify-between items-center my-8 p-6 bg-white rounded-2xl shadow-lg">
+    <div class="no-print flex flex-col md:flex-row justify-between items-center my-8 p-6 bg-white rounded-2xl shadow-lg fade-in">
       <div class="mb-4 md:mb-0">
         <span class="text-lg font-bold text-primary-blue mr-4">Trier par :</span>
         <button id="sortByDate" class="filter-btn active" data-sort="date">🕒 Plus récents</button>
@@ -614,7 +828,7 @@
     </div>
 
     <!-- Conteneur des messages -->
-    <section id="testimonialsContainer" class="my-8">
+    <section id="testimonialsContainer" class="my-8 fade-in">
       <!-- Les messages seront chargés ici dynamiquement -->
       <div class="empty-state" id="emptyState">
         <div class="empty-state-icon">📖</div>
@@ -625,7 +839,7 @@
     </section>
 
     <!-- Pagination -->
-    <div class="pagination no-print">
+    <div class="pagination no-print fade-in">
       <button id="prevPage" class="pagination-btn" disabled>← Précédent</button>
       <span id="pageInfo" class="pagination-info">Page 1 sur 1</span>
       <button id="nextPage" class="pagination-btn" disabled>Suivant →</button>
@@ -674,6 +888,7 @@
     const testimonialsContainer = document.getElementById('testimonialsContainer');
     const messageCountElement = document.getElementById('messageCount');
     const totalMessagesElement = document.getElementById('totalMessages');
+    const todayMessagesElement = document.getElementById('todayMessages');
     const emptyState = document.getElementById('emptyState');
     const prevPageButton = document.getElementById('prevPage');
     const nextPageButton = document.getElementById('nextPage');
@@ -684,30 +899,101 @@
     // Générer des particules flottantes
     function createParticles() {
       const particlesContainer = document.getElementById('particles');
-      const particleCount = 25;
+      const particleCount = 40;
       
       for (let i = 0; i < particleCount; i++) {
         const particle = document.createElement('div');
         particle.classList.add('particle');
         
-        const size = Math.random() * 20 + 5;
+        const size = Math.random() * 25 + 5;
         particle.style.width = `${size}px`;
         particle.style.height = `${size}px`;
         
         particle.style.left = `${Math.random() * 100}%`;
         particle.style.top = `${Math.random() * 100}%`;
         
-        particle.style.animationDelay = `${Math.random() * 15}s`;
+        particle.style.animationDelay = `${Math.random() * 20}s`;
         
         const colors = [
-          'rgba(30, 58, 138, 0.1)',
-          'rgba(217, 119, 6, 0.1)',
-          'rgba(5, 150, 105, 0.1)'
+          'rgba(30, 58, 138, 0.2)',
+          'rgba(217, 119, 6, 0.2)',
+          'rgba(5, 150, 105, 0.2)',
+          'rgba(251, 191, 36, 0.2)',
+          'rgba(139, 92, 246, 0.2)'
         ];
         particle.style.background = colors[Math.floor(Math.random() * colors.length)];
         
         particlesContainer.appendChild(particle);
       }
+    }
+
+    // Générer des textes flottants magiques
+    function createFloatingTexts() {
+      const textsContainer = document.getElementById('floatingTexts');
+      const texts = [
+        "70 Ans", "ITS Salama", "Don Bosco", "1955-2025", 
+        "Excellence", "Formation", "Éducation", "Technique",
+        "Félicitations", "Joyeux Anniversaire", "Merci", "Bravo",
+        "Livre d'Or", "Témoignages", "Hommage", "Célébration"
+      ];
+      
+      texts.forEach((text, index) => {
+        const floatingText = document.createElement('div');
+        floatingText.classList.add('floating-text');
+        floatingText.textContent = text;
+        
+        floatingText.style.left = `${Math.random() * 90 + 5}%`;
+        floatingText.style.animationDelay = `${Math.random() * 15}s`;
+        floatingText.style.fontSize = `${Math.random() * 1.5 + 1.5}rem`;
+        
+        textsContainer.appendChild(floatingText);
+      });
+    }
+
+    // Effet de lumière qui suit la souris
+    function initLightSpot() {
+      const lightSpot = document.getElementById('lightSpot');
+      document.addEventListener('mousemove', (e) => {
+        lightSpot.style.left = `${e.clientX}px`;
+        lightSpot.style.top = `${e.clientY}px`;
+      });
+    }
+
+    // Créer un effet de feu d'artifice
+    function createFireworks() {
+      // Utiliser confetti si disponible
+      if (typeof confetti !== 'undefined') {
+        for (let i = 0; i < 5; i++) {
+          setTimeout(() => {
+            confetti({
+              particleCount: 150,
+              spread: 100,
+              origin: { 
+                x: Math.random(),
+                y: Math.random() * 0.5
+              },
+              colors: ['#1E3A8A', '#D97706', '#059669', '#FBBF24', '#8B5CF6'],
+              shapes: ['circle', 'square'],
+              scalar: 1.2
+            });
+          }, i * 300);
+        }
+      }
+    }
+
+    // Animation d'entrée des sections
+    function initScrollAnimations() {
+      const fadeElements = document.querySelectorAll('.fade-in');
+      
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.1 });
+      
+      fadeElements.forEach(el => observer.observe(el));
     }
 
     // Charger tous les messages
@@ -724,7 +1010,7 @@
           allMessages.push(data);
         });
         
-        updateMessageCount();
+        updateMessageCounts();
         filterMessages();
         sortMessages(currentSort);
         displayCurrentPage();
@@ -741,6 +1027,29 @@
       }
     }
 
+    // Mettre à jour les compteurs de messages
+    function updateMessageCounts() {
+      const count = filteredMessages.length;
+      messageCountElement.textContent = count;
+      totalMessagesElement.textContent = allMessages.length;
+      
+      // Compter les messages d'aujourd'hui
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todayMessages = allMessages.filter(msg => {
+        const messageDate = msg.timestamp.toDate();
+        return messageDate >= today;
+      });
+      
+      todayMessagesElement.textContent = todayMessages.length;
+      
+      if (count === 0) {
+        emptyState.style.display = 'block';
+      } else {
+        emptyState.style.display = 'none';
+      }
+    }
+
     // Filtrer les messages selon la recherche
     function filterMessages() {
       if (!searchTerm) {
@@ -753,20 +1062,7 @@
         );
       }
       currentPage = 1;
-      updateMessageCount();
-    }
-
-    // Mettre à jour le compteur de messages
-    function updateMessageCount() {
-      const count = filteredMessages.length;
-      messageCountElement.textContent = count;
-      totalMessagesElement.textContent = allMessages.length;
-      
-      if (count === 0) {
-        emptyState.style.display = 'block';
-      } else {
-        emptyState.style.display = 'none';
-      }
+      updateMessageCounts();
     }
 
     // Trier les messages
@@ -826,6 +1122,16 @@
       card.className = 'testimonial-card animate-card';
       card.style.animationDelay = `${index * 100}ms`;
       
+      // Ajouter un effet de pulse pour les nouveaux messages (moins de 24h)
+      const now = new Date();
+      const messageDate = message.timestamp.toDate();
+      const timeDiff = now - messageDate;
+      const hoursDiff = timeDiff / (1000 * 60 * 60);
+      
+      if (hoursDiff < 24) {
+        card.classList.add('pulse-glow');
+      }
+      
       const date = message.timestamp ? 
         message.timestamp.toDate().toLocaleDateString('fr-FR', { 
           day: '2-digit', 
@@ -868,6 +1174,41 @@
 
     function closeModal(modalId) {
       document.getElementById(modalId).classList.remove('open');
+    }
+
+    // Initialiser GSAP pour des animations avancées
+    function initGSAPAnimations() {
+      if (typeof gsap !== 'undefined') {
+        // Animation des cartes de témoignage
+        gsap.from('.testimonial-card', {
+          scrollTrigger: {
+            trigger: '#testimonialsContainer',
+            start: 'top 80%',
+            end: 'bottom 20%',
+            toggleActions: 'play none none reverse'
+          },
+          duration: 0.8,
+          y: 50,
+          opacity: 0,
+          stagger: 0.1,
+          ease: 'power3.out'
+        });
+        
+        // Animation des statistiques
+        gsap.from('.stat-item', {
+          scrollTrigger: {
+            trigger: '.stats-container',
+            start: 'top 80%',
+            end: 'bottom 20%',
+            toggleActions: 'play none none reverse'
+          },
+          duration: 1,
+          y: 50,
+          opacity: 0,
+          stagger: 0.2,
+          ease: 'power3.out'
+        });
+      }
     }
 
     // Événements
@@ -930,6 +1271,8 @@
       } else {
         errorElement.style.display = 'block';
         errorElement.textContent = 'Mot de passe incorrect';
+        document.getElementById('adminPassword').classList.add('vibrate');
+        setTimeout(() => document.getElementById('adminPassword').classList.remove('vibrate'), 500);
       }
     });
 
@@ -937,6 +1280,26 @@
     document.addEventListener('DOMContentLoaded', () => {
       loadAllMessages();
       createParticles();
+      createFloatingTexts();
+      initLightSpot();
+      initScrollAnimations();
+      initGSAPAnimations();
+      
+      // Vérifier si nous venons de la page d'accueil avec un message nouvellement soumis
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('newMessage') === 'true') {
+        // Faire un effet spécial pour le nouveau message
+        setTimeout(() => {
+          if (typeof confetti !== 'undefined') {
+            confetti({
+              particleCount: 200,
+              spread: 100,
+              origin: { y: 0.6 },
+              colors: ['#1E3A8A', '#D97706', '#059669']
+            });
+          }
+        }, 1000);
+      }
     });
   </script>
 </body>
